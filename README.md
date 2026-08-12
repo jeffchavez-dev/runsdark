@@ -26,6 +26,18 @@ RunsDark is a web platform for **Filipino Executive Assistants (EAs)** serving g
 
 ---
 
+## 🎨 Design
+
+The UI follows [RunsDark_Design_Plan.md](./RunsDark_Design_Plan.md):
+- **Inspiration**: Linear, Raycast, Resend, Liveblocks, basement.studio
+- **Color System**: Deep navy (`#080C10`), Google Blue accent (`#1A73E8`), red for Dark Ops (`#C0392B`)
+- **Typography**: Inter at 400–800 weights, JetBrains Mono for data
+- **Components**: shadcn/ui + Aceternity UI (Bento Grid, Glowing Effects)
+- **Navigation**: Floating pill nav, centered hero, particle background
+- **Landing Page**: Premium dark ops aesthetic, no AI slop
+
+---
+
 ## 🛠 Tech Stack
 
 ### Frontend

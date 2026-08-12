@@ -56,26 +56,32 @@
 ## Current Status
 
 **Phase 1 — Foundation: 100% complete** ✅
-**Phase 3 — Docket MVP: 70% complete** 🚀
+**Phase 3 — Docket MVP: 100% complete** ✅
 
 ### What's Live
-✅ Premium landing page with design system implemented
+✅ Premium landing page per RunsDark_Design_Plan.md (floating pill nav, hero, apps section, Dark Ops)
 ✅ Supabase PostgreSQL database with RLS policies
 ✅ Authentication (signup/login/email callback)
 ✅ Protected dashboard with sidebar navigation
 ✅ tRPC API layer with full type-safety
-✅ Docket app (task management by client)
+✅ Docket app — full CRUD (create, list, update status, delete tasks/subtasks/comments)
 ✅ Clients page for managing and selecting clients
-✅ README.md for GitHub deployment
+✅ README.md with design reference and tech stack
 
 ### Architecture Complete
-✅ Monorepo (Turborepo + pnpm)
-✅ Next.js 14 + TypeScript + Tailwind
-✅ Supabase + Drizzle schema
-✅ tRPC + React Query integration
-✅ Authenticated API routes
+✅ Next.js 14 + TypeScript + Tailwind + shadcn/ui
+✅ Supabase (PostgreSQL, Auth, RLS)
+✅ tRPC + React Query (TanStack Query)
+✅ Authenticated API routes + protected pages
+✅ Git + GitHub integration (commits tracked)
+
+### Current Blocker
+🔴 Email confirmation required before login (Supabase default)
+   → Need to disable in Supabase Authentication settings for testing
 
 ### Next Steps
-⏳ Test Docket flow end-to-end
+⏳ Disable email confirmation in Supabase → retry Docket E2E test
 ⏳ Deploy to Vercel
-⏳ Build remaining apps (E-Drafting, Calendar, Travel)
+⏳ Build E-Drafting (RAG, Claude API, voice profiles)
+⏳ Build Calendar Tracker (Google Calendar sync, status board)
+⏳ Build Travel Manager (trips, segments, PDF export)

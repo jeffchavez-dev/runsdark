@@ -1,4 +1,4 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 
 export default function Home() {
   return (
@@ -83,38 +83,115 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Three Apps Section - Coming soon */}
-      <section className="relative py-24 px-4 bg-bg-base">
+      {/* Apps Section — Bento-style Grid */}
+      <section id="apps" className="relative py-24 px-4 bg-bg-base">
         <div className="max-w-6xl mx-auto">
           <div className="text-center space-y-4 mb-16">
-            <p className="mono text-accent-primary font-semibold">Three Essential Apps</p>
-            <h2 className="text-section font-bold">Everything an EA needs.</h2>
+            <p className="mono text-accent-primary font-semibold text-sm tracking-widest">Three Essential Apps</p>
+            <h2 className="text-5xl md:text-6xl font-bold text-white mb-4">Everything an EA needs.</h2>
             <p className="text-text-secondary text-lg max-w-2xl mx-auto">
               Built specifically for managing global clients from anywhere.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* EDrafting */}
-            <div className="md:col-span-2 p-8 rounded-2xl border border-bg-border bg-bg-surface hover:border-accent-primary/30 transition-smooth cursor-pointer group">
+            {/* EDrafting — Large card */}
+            <div className="md:col-span-2 p-8 rounded-2xl border border-bg-border bg-bg-surface hover:border-accent-primary/30 transition-smooth group">
               <p className="mono text-accent-primary text-xs font-semibold tracking-widest uppercase">EDrafting</p>
               <h3 className="text-2xl font-semibold text-white mt-3">Draft emails that sound like your client</h3>
-              <p className="text-text-secondary mt-3">Upload reference docs. AI learns the voice. You approve in seconds.</p>
+              <p className="text-text-secondary mt-3 max-w-md">Upload reference docs. AI learns the voice. You approve in seconds.</p>
             </div>
 
             {/* Calendar Tracker */}
-            <div className="p-8 rounded-2xl border border-bg-border bg-bg-surface hover:border-accent-primary/30 transition-smooth cursor-pointer">
+            <div className="p-8 rounded-2xl border border-bg-border bg-bg-surface hover:border-accent-primary/30 transition-smooth group">
               <p className="mono text-accent-primary text-xs font-semibold tracking-widest uppercase">Calendar</p>
-              <h3 className="text-xl font-semibold text-white mt-3">Track booking status across clients</h3>
+              <h3 className="text-xl font-semibold text-white mt-3">Track booking status</h3>
               <p className="text-text-secondary text-sm mt-3">One dashboard. Six statuses. Zero missed follow-ups.</p>
             </div>
 
             {/* Docket */}
-            <div className="p-8 rounded-2xl border border-bg-border bg-bg-surface hover:border-accent-primary/30 transition-smooth cursor-pointer">
+            <div className="p-8 rounded-2xl border border-bg-border bg-bg-surface hover:border-accent-primary/30 transition-smooth group">
               <p className="mono text-accent-primary text-xs font-semibold tracking-widest uppercase">Docket</p>
-              <h3 className="text-xl font-semibold text-white mt-3">Task management per client</h3>
-              <p className="text-text-secondary text-sm mt-3">Organized, prioritized, never loses context switching.</p>
+              <h3 className="text-xl font-semibold text-white mt-3">Task management</h3>
+              <p className="text-text-secondary text-sm mt-3">Organized, prioritized, context-aware.</p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Free Tools Section */}
+      <section className="relative py-24 px-4 bg-bg-base">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center space-y-4 mb-16">
+            <h2 className="text-5xl md:text-6xl font-bold text-white mb-4">Free browser tools.</h2>
+            <p className="text-text-secondary text-lg max-w-2xl mx-auto">
+              Purpose-built utilities. Zero installation. Always free.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {[
+              { name: "ghl-workflow", desc: "GHL Workflow Visualizer", tags: ["GHL", "Flow"] },
+              { name: "n8n-validator", desc: "n8n JSON Validator", tags: ["n8n", "JSON"] },
+              { name: "json-formatter", desc: "JSON Formatter & Beautifier", tags: ["JSON", "Format"] },
+              { name: "cron-gen", desc: "Cron Expression Generator", tags: ["Automation"] },
+              { name: "regex-tester", desc: "Regex Tester & Debugger", tags: ["Regex", "Dev"] },
+              { name: "pdf-merge", desc: "PDF Merge & Split", tags: ["PDF", "Client"] },
+            ].map((tool) => (
+              <a
+                key={tool.name}
+                href={`/tools/${tool.name}`}
+                className="flex flex-col p-4 rounded-xl border border-bg-border bg-bg-surface hover:border-accent-primary/30 hover:bg-opacity-50 transition-colors group"
+              >
+                <p className="font-mono text-sm text-white group-hover:text-accent-primary transition">{tool.name}</p>
+                <p className="text-xs text-text-secondary mt-1">{tool.desc}</p>
+                <div className="flex gap-1 mt-2 flex-wrap">
+                  {tool.tags.map((tag) => (
+                    <span key={tag} className="px-1.5 py-0.5 text-[10px] rounded bg-bg-border text-text-muted">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="relative py-24 px-4 bg-bg-base">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center space-y-4 mb-16">
+            <h2 className="text-5xl md:text-6xl font-bold text-white mb-4">How it works.</h2>
+            <p className="text-text-secondary text-lg max-w-2xl mx-auto">
+              Three simple steps to get your EA workspace running.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                num: "01",
+                title: "Sign up free",
+                desc: "Create your account in seconds. No credit card required.",
+              },
+              {
+                num: "02",
+                title: "Add your clients",
+                desc: "Invite your team and manage all your clients in one place.",
+              },
+              {
+                num: "03",
+                title: "Start using",
+                desc: "Draft emails, track calendars, manage tasks. Instantly productive.",
+              },
+            ].map((step) => (
+              <div key={step.num} className="text-center">
+                <div className="text-5xl font-black text-accent-primary mb-4">{step.num}</div>
+                <h3 className="text-xl font-semibold text-white mb-2">{step.title}</h3>
+                <p className="text-text-secondary">{step.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
