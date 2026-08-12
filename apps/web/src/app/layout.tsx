@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { TrpcProvider } from "@/lib/trpc/provider";
 
 export const metadata: Metadata = {
   title: "RunsDark",
@@ -14,7 +15,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-base-base text-text-primary">
-        {children}
+        <TrpcProvider>
+          {children}
+        </TrpcProvider>
       </body>
     </html>
   );
