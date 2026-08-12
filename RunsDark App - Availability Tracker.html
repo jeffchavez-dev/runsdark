@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Availability Tracker</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #ffffff;
+    --bg-secondary: #f5f5f3;
+    --bg-tertiary: #eeece8;
+    --text: #1a1a18;
+    --text-secondary: #6b6b67;
+    --border: rgba(0,0,0,0.12);
+    --border-md: rgba(0,0,0,0.22);
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --amber-bg: #FAEEDA;
+    --amber-text: #854F0B;
+    --amber-border: #EF9F27;
+    --green-bg: #EAF3DE;
+    --green-text: #3B6D11;
+    --green-border: #639922;
+    --red-bg: #FCEBEB;
+    --red-text: #A32D2D;
+    --red-border: #E24B4A;
+    --warn-bg: #FAECE7;
+    --warn-border: #F0997B;
+    --warn-text: #993C1D;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1e1e1c;
+      --bg-secondary: #2a2a28;
+      --bg-tertiary: #333330;
+      --text: #f0ede8;
+      --text-secondary: #9a9994;
+      --border: rgba(255,255,255,0.1);
+      --border-md: rgba(255,255,255,0.2);
+      --amber-bg: #412402;
+      --amber-text: #FAC775;
+      --amber-border: #BA7517;
+      --green-bg: #173404;
+      --green-text: #C0DD97;
+      --green-border: #3B6D11;
+      --red-bg: #501313;
+      --red-text: #F7C1C1;
+      --red-border: #A32D2D;
+      --warn-bg: #4A1B0C;
+      --warn-border: #D85A30;
+      --warn-text: #F0997B;
+    }
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg-tertiary);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 860px; margin: 0 auto; }
+  h1 { font-size: 20px; font-weight: 500; margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 1.5rem; }
+  input, select {
+    height: 36px; font-size: 14px; padding: 0 10px;
+    border: 0.5px solid var(--border-md); border-radius: var(--radius-md);
+    background: var(--bg); color: var(--text); outline: none;
+  }
+  input:focus, select:focus { border-color: #378ADD; box-shadow: 0 0 0 2px rgba(55,138,221,0.15); }
+  button {
+    font-size: 13px; padding: 0 14px; height: 32px;
+    border: 0.5px solid var(--border-md); border-radius: var(--radius-md);
+    cursor: pointer; background: var(--bg); color: var(--text);
+    transition: background 0.1s;
+  }
+  button:hover { background: var(--bg-secondary); }
+  .section-label { font-size: 11px; color: var(--text-secondary); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 4px; }
+  .form-card {
+    background: var(--bg-secondary); border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg); padding: 16px 18px; margin-bottom: 1rem;
+  }
+  .form-row { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 12px; }
+  .time-slot-row {
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+    margin-bottom: 8px; padding: 8px 10px;
+    background: var(--bg); border: 0.5px solid var(--border);
+    border-radius: var(--radius-md);
+  }
+  .time-slot-row input[type="datetime-local"] { width: 190px; }
+  .remove-slot-btn { color: var(--red-text); border-color: var(--red-border); padding: 0 10px; height: 28px; font-size: 12px; }
+  .add-time-btn { font-size: 12px; height: 28px; padding: 0 12px; border-style: dashed; color: var(--text-secondary); }
+  .submit-btn { height: 36px; padding: 0 20px; font-size: 14px; font-weight: 500; }
+  .paste-card {
+    background: var(--bg-secondary); border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg); padding: 16px 18px; margin-bottom: 1rem;
+  }
+  .paste-toggle {
+    font-size: 13px; color: var(--text-secondary); background: transparent;
+    border: none; cursor: pointer; padding: 0; display: flex; align-items: center; gap: 5px;
+    height: auto; margin-bottom: 0;
+  }
+  .paste-toggle:hover { color: var(--text); background: transparent; }
+  .paste-body { margin-top: 10px; }
+  textarea.paste-input {
+    width: 100%; min-height: 110px; font-size: 13px; padding: 10px 12px;
+    border: 0.5px solid var(--border-md); border-radius: var(--radius-md);
+    background: var(--bg); color: var(--text); resize: vertical; line-height: 1.6;
+    font-family: inherit; outline: none;
+  }
+  textarea.paste-input:focus { border-color: #378ADD; box-shadow: 0 0 0 2px rgba(55,138,221,0.15); }
+  .paste-preview { margin-top: 8px; font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+  .paste-preview .preview-ok { color: var(--green-text); }
+  .paste-preview .preview-err { color: var(--red-text); }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1rem; }
+  .stat {
+    background: var(--bg-secondary); border-radius: var(--radius-md); padding: 12px 14px;
+    cursor: pointer; border: 0.5px solid transparent; transition: border-color 0.15s;
+  }
+  .stat:hover { border-color: var(--border-md); }
+  .stat.active-stat { border-color: #378ADD; }
+  .stat-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
+  .stat-num { font-size: 22px; font-weight: 500; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 2px; border-bottom: 0.5px solid var(--border); margin-bottom: 14px; }
+  .tab-btn {
+    font-size: 13px; padding: 7px 18px; height: auto;
+    border: none; border-radius: var(--radius-md) var(--radius-md) 0 0;
+    background: transparent; color: var(--text-secondary);
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+  }
+  .tab-btn.active { color: var(--text); border-bottom: 2px solid #378ADD; font-weight: 500; }
+  .tab-btn:hover { background: var(--bg-secondary); }
+
+  .filter-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .filter-btn {
+    font-size: 12px; padding: 4px 14px; height: auto;
+    border: 0.5px solid var(--border-md); border-radius: 20px;
+    background: var(--bg); color: var(--text-secondary);
+  }
+  .filter-btn.active { background: var(--bg-secondary); color: var(--text); font-weight: 500; }
+  .group {
+    background: var(--bg); border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg); margin-bottom: 10px; overflow: hidden;
+  }
+  .group-header {
+    display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+    border-bottom: 0.5px solid var(--border); flex-wrap: wrap;
+    background: var(--bg-secondary);
+  }
+  .group-contact { font-size: 14px; font-weight: 500; }
+  .group-count { font-size: 12px; color: var(--text-secondary); }
+  .slot-row {
+    display: flex; align-items: center; gap: 10px; padding: 9px 14px;
+    border-bottom: 0.5px solid var(--border); flex-wrap: wrap;
+  }
+  .slot-row:last-child { border-bottom: none; }
+  .slot-dt { font-size: 13px; flex: 1; min-width: 200px; }
+  .badge { font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 500; white-space: nowrap; }
+  .badge-offered { background: var(--amber-bg); color: var(--amber-text); }
+  .badge-confirmed { background: var(--green-bg); color: var(--green-text); }
+  .badge-declined { background: var(--red-bg); color: var(--red-text); }
+  .slot-actions { display: flex; gap: 5px; }
+  .action-btn { font-size: 11px; padding: 0 9px; height: 26px; }
+  .del-btn { color: var(--red-text); border-color: var(--red-border); }
+  .conflict-warn { font-size: 11px; color: var(--warn-text); margin-top: 3px; }
+  .edit-pencil-btn {
+    font-size: 13px; padding: 0 5px; height: 22px; border: none;
+    background: transparent; color: var(--text-secondary); cursor: pointer;
+    border-radius: var(--radius-md); opacity: 0.5; line-height: 1;
+  }
+  .edit-pencil-btn:hover { opacity: 1; background: var(--bg-secondary); }
+  .conflict-banner {
+    background: var(--warn-bg); border: 0.5px solid var(--warn-border);
+    border-radius: var(--radius-md); padding: 8px 12px;
+    font-size: 13px; color: var(--warn-text); margin-bottom: 10px; display: none;
+  }
+  .empty { text-align: center; color: var(--text-secondary); font-size: 14px; padding: 2rem; }
+  .clear-btn { font-size: 12px; color: var(--red-text); border-color: var(--red-border); height: 28px; padding: 0 12px; }
+  .copy-btn { font-size: 12px; height: 28px; padding: 0 12px; color: var(--text-secondary); }
+
+  /* Calendar */
+  .cal-nav { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .cal-nav button { height: 30px; padding: 0 14px; }
+  .cal-month-label { font-size: 15px; font-weight: 500; flex: 1; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; }
+  .cal-day-header { font-size: 10px; color: var(--text-secondary); text-align: center; padding: 4px 0; letter-spacing: 0.05em; text-transform: uppercase; }
+  .cal-cell {
+    min-height: 78px; background: var(--bg); border: 0.5px solid var(--border);
+    border-radius: var(--radius-md); padding: 5px 5px 4px; position: relative;
+  }
+  .cal-cell.other-month { background: var(--bg-secondary); opacity: 0.45; }
+  .cal-cell.today { border-color: #378ADD; }
+  .cal-date { font-size: 11px; color: var(--text-secondary); margin-bottom: 3px; line-height: 1; }
+  .cal-date.today-num { color: #378ADD; font-weight: 700; }
+  .cal-event {
+    font-size: 10px; padding: 2px 4px; border-radius: 3px;
+    margin-bottom: 2px; white-space: nowrap; overflow: hidden;
+    text-overflow: ellipsis; line-height: 1.5; display: block;
+  }
+  .cal-event-offered { background: var(--amber-bg); color: var(--amber-text); }
+  .cal-event-confirmed { background: var(--green-bg); color: var(--green-text); }
+  .cal-event-declined { background: var(--red-bg); color: var(--red-text); opacity: 0.55; }
+  .cal-event-conflict { outline: 1.5px solid var(--warn-border); }
+  .cal-event { cursor: pointer; }
+  .cal-event:hover { opacity: 0.8; }
+  .slot-row.is-past { opacity: 0.45; }
+  .slot-row.is-past.archived-hidden { display: none; }
+  .cal-legend { display: flex; gap: 14px; margin-top: 10px; flex-wrap: wrap; }
+  .cal-legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-secondary); }
+  .cal-legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Availability Tracker</h1>
+  <p class="subtitle">Track time slots offered to contacts — avoid double-booking your pending times.</p>
+
+  <div class="form-card">
+    <div class="form-row">
+      <div>
+        <div class="section-label">Contact name</div>
+        <input type="text" id="contact" placeholder="e.g. Maria Santos" style="width:190px" />
+      </div>
+      <div>
+        <div class="section-label">Default duration</div>
+        <select id="defaultDur">
+          <option value="30">30 min</option>
+          <option value="45">45 min</option>
+          <option value="60" selected>1 hr</option>
+          <option value="90">1.5 hr</option>
+          <option value="120">2 hr</option>
+        </select>
+      </div>
+    </div>
+    <div class="section-label" style="margin-bottom:6px">Times offered</div>
+    <div id="time-rows"></div>
+    <button class="add-time-btn" onclick="addTimeRow()">+ Add another time</button>
+    <div style="margin-top:12px;">
+      <button class="submit-btn" onclick="submitSlots()">Save offered times</button>
+    </div>
+  </div>
+
+  <!-- Paste schedule card -->
+  <div class="paste-card">
+    <button class="paste-toggle" onclick="togglePaste()">
+      <span id="paste-arrow">▶</span> Paste schedule instead
+    </button>
+    <div class="paste-body" id="paste-body" style="display:none;">
+      <p style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">
+        Paste a schedule in any readable format. Duration is auto-computed from start/end times.
+      </p>
+      <textarea class="paste-input" id="paste-input" placeholder="Name: Ryan Lin&#10;April 6 (Monday):&#10;• 12:15pm - 12:45pm&#10;April 8 (Wednesday):&#10;• 11:15am - 12:00pm" oninput="previewPaste()" onkeydown="if(event.ctrlKey&&event.key==='Enter'||event.metaKey&&event.key==='Enter')savePaste()"></textarea>
+      <div class="paste-preview" id="paste-preview"></div>
+      <div style="margin-top:10px;display:flex;gap:8px;">
+        <button class="submit-btn" onclick="savePaste()">Add to tracker</button>
+        <button style="height:36px;padding:0 14px;font-size:13px;" onclick="clearPaste()">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="conflict-banner" class="conflict-banner"></div>
+
+  <div class="stats">
+    <div class="stat" id="stat-all" onclick="statClick('all')" title="Show all slots">
+      <div class="stat-label">Total offered</div><div class="stat-num" id="s-total">0</div>
+    </div>
+    <div class="stat" id="stat-offered" onclick="statClick('offered')" title="Show pending only">
+      <div class="stat-label">Pending</div><div class="stat-num" id="s-pending" style="color:#BA7517">0</div>
+    </div>
+    <div class="stat" id="stat-confirmed" onclick="statClick('confirmed')" title="Show confirmed only">
+      <div class="stat-label">Confirmed</div><div class="stat-num" id="s-confirmed" style="color:#3B6D11">0</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('list',this)">List view</button>
+    <button class="tab-btn" onclick="switchTab('calendar',this)">Calendar view</button>
+  </div>
+
+  <!-- List view -->
+  <div id="list-controls" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+        <button class="filter-btn" onclick="setFilter('offered',this)">Pending</button>
+        <button class="filter-btn" onclick="setFilter('confirmed',this)">Confirmed</button>
+        <button class="filter-btn" onclick="setFilter('declined',this)">Declined</button>
+      </div>
+      <div style="display:flex; align-items:center; gap:5px;">
+        <span style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.05em;">Sort</span>
+        <select id="sort-select" onchange="setSort(this.value)" style="height:28px;font-size:12px;padding:0 8px;">
+          <option value="time-asc">Time ↑</option>
+          <option value="time-desc">Time ↓</option>
+          <option value="name-asc">Name A–Z</option>
+          <option value="name-desc">Name Z–A</option>
+          <option value="status">Status</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center;">
+      <button class="copy-btn" id="hide-past-btn" onclick="toggleHidePast()" title="Hide/show past meetings">⏱ Hide past</button>
+      <button class="copy-btn" id="copy-btn" onclick="copySchedule()">⎘ Copy schedule</button>
+      <button class="clear-btn" onclick="clearAll()">Clear all</button>
+    </div>
+  </div>
+  <div id="slots-list"></div>
+
+  <!-- Calendar view -->
+  <div id="calendar-view" style="display:none;">
+    <div class="cal-nav">
+      <button onclick="calPrev()">&#8592; Prev</button>
+      <span class="cal-month-label" id="cal-label"></span>
+      <button onclick="calNext()">Next &#8594;</button>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div class="cal-legend">
+      <div class="cal-legend-item">
+        <div class="cal-legend-dot" style="background:var(--amber-bg);border:1px solid var(--amber-border)"></div> Pending
+      </div>
+      <div class="cal-legend-item">
+        <div class="cal-legend-dot" style="background:var(--green-bg);border:1px solid var(--green-border)"></div> Confirmed
+      </div>
+      <div class="cal-legend-item">
+        <div class="cal-legend-dot" style="background:var(--red-bg);border:1px solid var(--red-border)"></div> Declined
+      </div>
+      <div class="cal-legend-item">
+        <div class="cal-legend-dot" style="background:var(--amber-bg);outline:1.5px solid var(--warn-border)"></div> Conflict
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const PRESET_SLOTS = [
+  { id: 1,  contact: 'Shelby',             dt: '2026-04-01T11:15', dur: 45,  status: 'offered' },
+  { id: 2,  contact: 'Ike Peng',           dt: '2026-04-02T13:15', dur: 45,  status: 'confirmed' },
+  { id: 3,  contact: 'Jeffrey & Raddick',  dt: '2026-04-03T10:30', dur: 30,  status: 'confirmed' },
+  { id: 4,  contact: 'Aryan',              dt: '2026-04-03T11:15', dur: 30,  status: 'confirmed' },
+  { id: 5,  contact: 'Nick Saban',         dt: '2026-04-03T13:30', dur: 60,  status: 'confirmed' },
+  { id: 6,  contact: 'Krish Patel',        dt: '2026-04-06T10:30', dur: 30,  status: 'confirmed' },
+  { id: 7,  contact: 'Alexander Braveman', dt: '2026-04-06T11:30', dur: 30,  status: 'confirmed' },
+  { id: 8,  contact: 'Katie & Michael',    dt: '2026-04-07T10:00', dur: 60,  status: 'offered' },
+  { id: 9,  contact: 'Ryan Lin',           dt: '2026-04-08T11:15', dur: 30,  status: 'confirmed' },
+  { id: 10, contact: 'Etan',               dt: '2026-04-08T12:15', dur: 30,  status: 'confirmed' },
+  { id: 11, contact: 'Katie & Michael',    dt: '2026-04-08T13:00', dur: 60,  status: 'offered' },
+  { id: 12, contact: 'Katie & Michael',    dt: '2026-04-09T13:00', dur: 60,  status: 'offered' },
+  { id: 13, contact: 'Shelby',             dt: '2026-04-14T10:15', dur: 30,  status: 'confirmed' },
+];
+
+let slots = [];
+try {
+  const stored = localStorage.getItem('avail_slots_v5');
+  slots = stored ? JSON.parse(stored) : PRESET_SLOTS;
+  if (!stored) localStorage.setItem('avail_slots_v5', JSON.stringify(PRESET_SLOTS));
+} catch(e) { slots = PRESET_SLOTS; }
+
+let filter = 'all';
+let timeRowCount = 0;
+let activeTab = 'list';
+const now = new Date();
+let calYear = now.getFullYear();
+let calMonth = now.getMonth();
+
+function save() { try { localStorage.setItem('avail_slots_v5', JSON.stringify(slots)); } catch(e){} }
+
+function fmt(dtStr, dur) {
+  const d = new Date(dtStr);
+  const end = new Date(d.getTime() + dur * 60000);
+  const dOpts = { weekday: 'short', month: 'short', day: 'numeric' };
+  const tOpts = { hour: 'numeric', minute: '2-digit', hour12: true };
+  return d.toLocaleDateString('en-US', dOpts) + ' · ' + d.toLocaleTimeString('en-US', tOpts) + ' – ' + end.toLocaleTimeString('en-US', tOpts);
+}
+
+function fmtTime(dtStr) {
+  return new Date(dtStr).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+}
+
+function overlaps(a, b) {
+  const aS = new Date(a.dt).getTime(), aE = aS + a.dur * 60000;
+  const bS = new Date(b.dt).getTime(), bE = bS + b.dur * 60000;
+  return aS < bE && bS < aE;
+}
+
+function findConflicts(slot) {
+  return slots.filter(s => s.id !== slot.id && s.status !== 'declined' && overlaps(s, slot));
+}
+
+function addTimeRow() {
+  timeRowCount++;
+  const id = 'tr-' + timeRowCount;
+  const div = document.createElement('div');
+  div.className = 'time-slot-row';
+  div.id = id;
+  div.innerHTML = `
+    <input type="datetime-local" class="dt-input" />
+    <select class="dur-input">
+      <option value="30">30 min</option>
+      <option value="45">45 min</option>
+      <option value="60" selected>1 hr</option>
+      <option value="90">1.5 hr</option>
+      <option value="120">2 hr</option>
+    </select>
+    ${timeRowCount > 1 ? `<button class="remove-slot-btn" onclick="removeTimeRow('${id}')">Remove</button>` : ''}
+  `;
+  document.getElementById('time-rows').appendChild(div);
+}
+
+function removeTimeRow(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+function submitSlots() {
+  const contact = document.getElementById('contact').value.trim();
+  if (!contact) { alert('Please enter a contact name.'); return; }
+  const rows = document.querySelectorAll('.time-slot-row');
+  const newSlots = [];
+  let hasEmpty = false;
+  rows.forEach(row => {
+    const dt = row.querySelector('.dt-input').value;
+    const dur = parseInt(row.querySelector('.dur-input').value);
+    if (!dt) { hasEmpty = true; return; }
+    newSlots.push({ id: Date.now() + Math.random(), contact, dt, dur, status: 'offered' });
+  });
+  if (newSlots.length === 0) { alert('Please add at least one date and time.'); return; }
+  if (hasEmpty) alert('Some time rows were empty and skipped.');
+  const conflictNames = new Set();
+  newSlots.forEach(ns => {
+    slots.forEach(existing => {
+      if (existing.status !== 'declined' && overlaps(ns, existing)) conflictNames.add(existing.contact);
+    });
+  });
+  slots = [...newSlots, ...slots];
+  save();
+  if (conflictNames.size) {
+    const banner = document.getElementById('conflict-banner');
+    banner.style.display = 'block';
+    banner.innerHTML = `⚠️ Some times overlap with slots already offered to: <strong>${[...conflictNames].join(', ')}</strong>. Update statuses as needed.`;
+    setTimeout(() => { banner.style.display = 'none'; }, 7000);
+  }
+  document.getElementById('contact').value = '';
+  document.getElementById('time-rows').innerHTML = '';
+  timeRowCount = 0;
+  addTimeRow();
+  render();
+}
+
+function updateStatus(id, status) {
+  const s = slots.find(s => s.id == id);
+  if (s) { s.status = status; save(); render(); }
+}
+
+function deleteSlot(id) {
+  slots = slots.filter(s => s.id != id);
+  save(); render();
+}
+
+function clearAll() {
+  if (confirm('Remove all slots? This cannot be undone.')) { slots = []; save(); render(); }
+}
+
+let hidePast = false;
+
+function toggleHidePast() {
+  hidePast = !hidePast;
+  const btn = document.getElementById('hide-past-btn');
+  btn.textContent = hidePast ? '⏱ Show past' : '⏱ Hide past';
+  btn.style.color = hidePast ? 'var(--green-text)' : '';
+  btn.style.borderColor = hidePast ? 'var(--green-border)' : '';
+  render();
+}
+
+function statClick(f) {
+  // Switch to list view, set filter, highlight stat card
+  const listTabBtn = document.querySelector('.tab-btn');
+  switchTab('list', listTabBtn);
+  filter = f;
+  // Sync filter buttons
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    const map = { all: 'All', offered: 'Pending', confirmed: 'Confirmed', declined: 'Declined' };
+    b.classList.toggle('active', b.textContent.trim() === map[f]);
+  });
+  // Highlight active stat card
+  document.querySelectorAll('.stat').forEach(s => s.classList.remove('active-stat'));
+  const statMap = { all: 'stat-all', offered: 'stat-offered', confirmed: 'stat-confirmed' };
+  if (statMap[f]) document.getElementById(statMap[f])?.classList.add('active-stat');
+  render();
+}
+
+function setFilter(f, btn) {
+  filter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // Clear stat card highlight when using filter buttons directly
+  document.querySelectorAll('.stat').forEach(s => s.classList.remove('active-stat'));
+  render();
+}
+
+let sortBy = 'time-asc';
+function setSort(val) { sortBy = val; render(); }
+
+function sortedSlots(arr) {
+  const statusOrder = { offered: 0, confirmed: 1, declined: 2 };
+  const copy = [...arr];
+  if (sortBy === 'time-asc')   return copy.sort((a,b) => new Date(a.dt) - new Date(b.dt));
+  if (sortBy === 'time-desc')  return copy.sort((a,b) => new Date(b.dt) - new Date(a.dt));
+  if (sortBy === 'name-asc')   return copy.sort((a,b) => a.contact.localeCompare(b.contact) || new Date(a.dt) - new Date(b.dt));
+  if (sortBy === 'name-desc')  return copy.sort((a,b) => b.contact.localeCompare(a.contact) || new Date(a.dt) - new Date(b.dt));
+  if (sortBy === 'status')     return copy.sort((a,b) => statusOrder[a.status] - statusOrder[b.status] || new Date(a.dt) - new Date(b.dt));
+  return copy;
+}
+
+function switchTab(tab, btn) {
+  activeTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('slots-list').style.display = tab === 'list' ? '' : 'none';
+  document.getElementById('list-controls').style.display = tab === 'list' ? 'flex' : 'none';
+  document.getElementById('calendar-view').style.display = tab === 'calendar' ? '' : 'none';
+  if (tab === 'calendar') renderCalendar();
+}
+
+function calPrev() {
+  calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; }
+  renderCalendar();
+}
+function calNext() {
+  calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; }
+  renderCalendar();
+}
+
+function isPast(slot) {
+  return new Date(slot.dt).getTime() + slot.dur * 60000 < Date.now();
+}
+
+function jumpToSlot(id) {
+  // Switch to list view, set filter to all, scroll to row
+  const listTabBtn = document.querySelector('.tab-btn');
+  switchTab('list', listTabBtn);
+  filter = 'all';
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.textContent.trim() === 'All'));
+  hidePast = false;
+  const btn = document.getElementById('hide-past-btn');
+  if (btn) { btn.textContent = '⏱ Hide past'; btn.style.color = ''; btn.style.borderColor = ''; }
+  render();
+  setTimeout(() => {
+    const row = document.getElementById('slot-row-' + id);
+    if (row) {
+      row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      row.style.outline = '2px solid #378ADD';
+      row.style.borderRadius = 'var(--radius-md)';
+      setTimeout(() => { row.style.outline = ''; }, 2000);
+    }
+  }, 80);
+}
+
+function renderCalendar() {
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  document.getElementById('cal-label').textContent = MONTHS[calMonth] + ' ' + calYear;
+
+  const today = new Date();
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const daysInPrev = new Date(calYear, calMonth, 0).getDate();
+
+  const byDay = {};
+  slots.forEach(s => {
+    const d = new Date(s.dt);
+    if (d.getFullYear() === calYear && d.getMonth() === calMonth) {
+      const key = d.getDate();
+      if (!byDay[key]) byDay[key] = [];
+      byDay[key].push(s);
+    }
+  });
+  Object.values(byDay).forEach(arr => arr.sort((a,b) => new Date(a.dt) - new Date(b.dt)));
+
+  let html = DAYS.map(d => `<div class="cal-day-header">${d}</div>`).join('');
+
+  for (let i = 0; i < firstDay; i++) {
+    html += `<div class="cal-cell other-month"><div class="cal-date">${daysInPrev - firstDay + 1 + i}</div></div>`;
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const isToday = d === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear();
+    const daySlots = byDay[d] || [];
+    const events = daySlots.map(slot => {
+      const hasConflict = slot.status === 'offered' && findConflicts(slot).length > 0;
+      const past = isPast(slot);
+      const cls = `cal-event cal-event-${slot.status}${hasConflict ? ' cal-event-conflict' : ''}`;
+      const name = slot.contact.split(' ')[0];
+      const tip = `${slot.contact} · ${fmtTime(slot.dt)} (${slot.dur}min)${hasConflict ? ' ⚠ conflict' : ''}${past ? ' · past' : ''}`;
+      return `<span class="${cls}" style="${past ? 'opacity:0.45;' : ''}" title="${tip}" onclick="jumpToSlot(${slot.id})">${name} ${fmtTime(slot.dt)}</span>`;
+    }).join('');
+    html += `<div class="cal-cell${isToday ? ' today' : ''}">
+      <div class="cal-date${isToday ? ' today-num' : ''}">${d}</div>
+      ${events}
+    </div>`;
+  }
+
+  const total = firstDay + daysInMonth;
+  const tail = total % 7 === 0 ? 0 : 7 - (total % 7);
+  for (let i = 1; i <= tail; i++) {
+    html += `<div class="cal-cell other-month"><div class="cal-date">${i}</div></div>`;
+  }
+
+  document.getElementById('cal-grid').innerHTML = html;
+}
+
+function durOptions(selected) {
+  return [
+    [30,'30 min'],[45,'45 min'],[60,'1 hr'],[90,'1.5 hr'],[120,'2 hr']
+  ].map(([v,l]) => `<option value="${v}"${v===selected?' selected':''}>${l}</option>`).join('');
+}
+
+function startEdit(id) {
+  const row = document.getElementById('slot-row-' + id);
+  if (!row) return;
+  row.querySelector('.slot-dt-display').style.display = 'none';
+  row.querySelector('.slot-dt-edit').style.display = 'flex';
+  row.querySelector('.slot-actions').style.display = 'none';
+  row.querySelector('.slot-edit-actions').style.display = 'flex';
+}
+
+function cancelEdit(id) {
+  const row = document.getElementById('slot-row-' + id);
+  if (!row) return;
+  row.querySelector('.slot-dt-display').style.display = '';
+  row.querySelector('.slot-dt-edit').style.display = 'none';
+  row.querySelector('.slot-actions').style.display = '';
+  row.querySelector('.slot-edit-actions').style.display = 'none';
+}
+
+function saveEdit(id) {
+  const row = document.getElementById('slot-row-' + id);
+  if (!row) return;
+  const newDt = row.querySelector('.edit-dt').value;
+  const newDur = parseInt(row.querySelector('.edit-dur').value);
+  if (!newDt) { alert('Please select a date and time.'); return; }
+  const slot = slots.find(s => s.id == id);
+  if (slot) { slot.dt = newDt; slot.dur = newDur; save(); render(); }
+}
+
+function render() {
+  const nowTs = Date.now();
+  document.getElementById('s-total').textContent = slots.length;
+  document.getElementById('s-pending').textContent = slots.filter(s => s.status === 'offered').length;
+  document.getElementById('s-confirmed').textContent = slots.filter(s => s.status === 'confirmed').length;
+
+  if (activeTab === 'calendar') { renderCalendar(); return; }
+
+  let visible = filter === 'all' ? slots : slots.filter(s => {
+    if (filter === 'offered') return s.status === 'offered';
+    return s.status === filter;
+  });
+
+  visible = sortedSlots(visible);
+
+  const list = document.getElementById('slots-list');
+  if (!visible.length) { list.innerHTML = '<div class="empty">No slots to show.</div>'; return; }
+
+  function slotRowHtml(slot, showContact = false) {
+    const conflicts = findConflicts(slot);
+    const warn = conflicts.length && slot.status === 'offered'
+      ? `<div class="conflict-warn">⚠️ Overlaps with ${conflicts.map(c => c.contact).join(', ')}</div>` : '';
+    const bClass = slot.status === 'confirmed' ? 'badge-confirmed' : slot.status === 'declined' ? 'badge-declined' : 'badge-offered';
+    const bLabel = slot.status === 'offered' ? 'Pending' : slot.status === 'confirmed' ? 'Confirmed' : 'Declined';
+    const past = isPast(slot);
+    const pastClass = past ? ' is-past' + (hidePast ? ' archived-hidden' : '') : '';
+
+    const displayDt = `
+      <div class="slot-dt-display" style="flex:1;min-width:200px;">
+        ${showContact ? `<div style="font-weight:500;font-size:13px;margin-bottom:1px">${slot.contact}</div>` : ''}
+        <div style="${showContact ? 'color:var(--text-secondary);' : ''}display:flex;align-items:center;gap:6px;">
+          <span class="slot-dt-text">${fmt(slot.dt, slot.dur)}</span>
+          ${past ? `<span style="font-size:10px;color:var(--text-secondary);background:var(--bg-secondary);padding:1px 6px;border-radius:10px;">past</span>` : ''}
+          <button class="edit-pencil-btn" onclick="startEdit(${slot.id})" title="Edit date & time">✎</button>
+        </div>
+        ${warn}
+      </div>`;
+
+    const editDt = `
+      <div class="slot-dt-edit" style="display:none;flex:1;min-width:200px;align-items:center;gap:6px;flex-wrap:wrap;">
+        ${showContact ? `<div style="font-weight:500;font-size:13px;width:100%;margin-bottom:2px">${slot.contact}</div>` : ''}
+        <input type="datetime-local" class="edit-dt" value="${slot.dt}" style="height:30px;font-size:12px;padding:0 7px;" />
+        <select class="edit-dur" style="height:30px;font-size:12px;padding:0 7px;">${durOptions(slot.dur)}</select>
+      </div>`;
+
+    return `<div class="slot-row${pastClass}" id="slot-row-${slot.id}" style="flex-wrap:wrap;">
+      ${displayDt}
+      ${editDt}
+      <span class="badge ${bClass}">${bLabel}</span>
+      <div class="slot-actions" style="display:flex;gap:5px;">
+        ${slot.status !== 'confirmed' ? `<button class="action-btn" onclick="updateStatus(${slot.id},'confirmed')">Confirm</button>` : ''}
+        ${slot.status !== 'declined' ? `<button class="action-btn" onclick="updateStatus(${slot.id},'declined')">Decline</button>` : ''}
+        ${slot.status === 'declined' ? `<button class="action-btn" onclick="updateStatus(${slot.id},'offered')">Reopen</button>` : ''}
+        <button class="action-btn del-btn" onclick="deleteSlot(${slot.id})">Remove</button>
+      </div>
+      <div class="slot-edit-actions" style="display:none;gap:5px;">
+        <button class="action-btn" style="color:var(--green-text);border-color:var(--green-border);" onclick="saveEdit(${slot.id})">Save</button>
+        <button class="action-btn" onclick="cancelEdit(${slot.id})">Cancel</button>
+      </div>
+    </div>`;
+  }
+
+  if (sortBy === 'name-asc' || sortBy === 'name-desc') {
+    const grouped = {};
+    visible.forEach(s => {
+      if (!grouped[s.contact]) grouped[s.contact] = [];
+      grouped[s.contact].push(s);
+    });
+    list.innerHTML = Object.entries(grouped).map(([contact, cSlots]) => {
+      const total = cSlots.length;
+      const confirmed = cSlots.filter(s => s.status === 'confirmed').length;
+      const pending = cSlots.filter(s => s.status === 'offered').length;
+      return `<div class="group">
+        <div class="group-header">
+          <span class="group-contact">${contact}</span>
+          <span class="group-count">${total} slot${total!==1?'s':''} · ${pending} pending · ${confirmed} confirmed</span>
+        </div>
+        ${cSlots.map(s => slotRowHtml(s, false)).join('')}
+      </div>`;
+    }).join('');
+  } else {
+    list.innerHTML = `<div class="group">${visible.map(s => slotRowHtml(s, true)).join('')}</div>`;
+  }
+}
+
+function copySchedule() {
+  let visible = filter === 'all' ? slots : slots.filter(s => {
+    if (filter === 'offered') return s.status === 'offered';
+    return s.status === filter;
+  });
+  visible = sortedSlots(visible);
+
+  if (!visible.length) { alert('No slots to copy.'); return; }
+
+  const statusLabel = { offered: 'Pending', confirmed: 'Confirmed', declined: 'Declined' };
+  const grouped = {};
+  visible.forEach(s => {
+    if (!grouped[s.contact]) grouped[s.contact] = [];
+    grouped[s.contact].push(s);
+  });
+
+  const lines = [];
+  Object.entries(grouped).forEach(([contact, cSlots]) => {
+    lines.push(contact);
+    cSlots.forEach(s => {
+      const d = new Date(s.dt);
+      const end = new Date(d.getTime() + s.dur * 60000);
+      const datePart = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+      const tOpts = { hour: 'numeric', minute: '2-digit', hour12: true };
+      const timePart = d.toLocaleTimeString('en-US', tOpts) + ' – ' + end.toLocaleTimeString('en-US', tOpts);
+      lines.push(`  • ${datePart} · ${timePart} (${statusLabel[s.status]})`);
+    });
+    lines.push('');
+  });
+
+  const text = lines.join('\n').trim();
+
+  function onCopied() {
+    const btn = document.getElementById('copy-btn');
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    btn.style.color = 'var(--green-text)';
+    btn.style.borderColor = 'var(--green-border)';
+    btn.style.fontWeight = '500';
+    setTimeout(() => { btn.textContent = orig; btn.style.color = ''; btn.style.borderColor = ''; btn.style.fontWeight = ''; }, 2500);
+    alert('✓ Schedule copied to clipboard!');
+  }
+
+  function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.top = '0';
+    ta.style.left = '0';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try {
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      if (ok) onCopied();
+      else alert('Could not copy automatically. Please select all text and copy manually.');
+    } catch(e) {
+      document.body.removeChild(ta);
+      alert('Could not copy automatically. Please select all text and copy manually.');
+    }
+  }
+
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(onCopied).catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function togglePaste() {
+  const body = document.getElementById('paste-body');
+  const arrow = document.getElementById('paste-arrow');
+  const open = body.style.display === 'none';
+  body.style.display = open ? '' : 'none';
+  arrow.textContent = open ? '▼' : '▶';
+}
+
+function clearPaste() {
+  document.getElementById('paste-input').value = '';
+  document.getElementById('paste-preview').innerHTML = '';
+}
+
+function parseTime(str) {
+  // parse "12:15pm", "12:15 PM", "12pm", "12:00am" etc.
+  str = str.trim().toLowerCase().replace(/\s/g, '');
+  const m = str.match(/^(\d{1,2})(?::(\d{2}))?(am|pm)$/);
+  if (!m) return null;
+  let h = parseInt(m[1]);
+  const min = parseInt(m[2] || '0');
+  const ampm = m[3];
+  if (ampm === 'am' && h === 12) h = 0;
+  if (ampm === 'pm' && h !== 12) h += 12;
+  return { h, min };
+}
+
+function parseDate(str, year) {
+  // parse "April 6", "Apr 6", "April 6 (Monday)" etc.
+  str = str.replace(/\(.*?\)/g, '').trim();
+  const months = { january:1,february:2,march:3,april:4,may:5,june:6,july:7,august:8,september:9,october:10,november:11,december:12,
+    jan:1,feb:2,mar:3,apr:4,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12 };
+  const m = str.toLowerCase().match(/([a-z]+)\s+(\d{1,2})/);
+  if (!m) return null;
+  const mo = months[m[1]];
+  if (!mo) return null;
+  return { month: mo, day: parseInt(m[2]), year };
+}
+
+function parsePaste(text) {
+  const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+  const results = [];
+  const errors = [];
+  let contact = null;
+  let currentDate = null;
+  const year = new Date().getFullYear();
+
+  for (const line of lines) {
+    // Detect contact name line: "Name: ..." or just a plain name line with no time/date
+    const nameMatch = line.match(/^(?:name\s*:\s*)(.+)$/i);
+    if (nameMatch) { contact = nameMatch[1].trim(); currentDate = null; continue; }
+
+    // Detect date line: contains a month name and a number
+    const dateObj = parseDate(line, year);
+    if (dateObj) { currentDate = dateObj; continue; }
+
+    // Detect time range line: "• 12:15pm - 12:45pm" or "12:15pm - 12:45pm" or "12:15pm–12:45pm"
+    const timeMatch = line.replace(/[•\-–—]/g, (c, i) => {
+      // keep the separator between two times; replace bullet
+      return (i === 0) ? ' ' : c;
+    }).match(/(\d{1,2}(?::\d{2})?\s*[ap]m)\s*[-–—]\s*(\d{1,2}(?::\d{2})?\s*[ap]m)/i);
+
+    if (timeMatch) {
+      if (!contact) { errors.push(`No contact name found before: "${line}"`); continue; }
+      if (!currentDate) { errors.push(`No date found before time: "${line}"`); continue; }
+      const start = parseTime(timeMatch[1]);
+      const end = parseTime(timeMatch[2]);
+      if (!start || !end) { errors.push(`Could not parse time: "${line}"`); continue; }
+
+      const dtStr = `${currentDate.year}-${String(currentDate.month).padStart(2,'0')}-${String(currentDate.day).padStart(2,'0')}T${String(start.h).padStart(2,'0')}:${String(start.min).padStart(2,'0')}`;
+      const startMs = start.h * 60 + start.min;
+      const endMs = end.h * 60 + end.min;
+      const dur = endMs - startMs;
+      if (dur <= 0) { errors.push(`End time is before start time: "${line}"`); continue; }
+
+      results.push({ contact, dt: dtStr, dur });
+      continue;
+    }
+
+    // If line has no name/date/time but has content, try treating it as a contact name (no "Name:" prefix)
+    if (!line.match(/[:•\-–]/)) {
+      contact = line;
+      currentDate = null;
+    }
+  }
+
+  return { results, errors };
+}
+
+function previewPaste() {
+  const text = document.getElementById('paste-input').value;
+  const preview = document.getElementById('paste-preview');
+  if (!text.trim()) { preview.innerHTML = ''; return; }
+
+  const { results, errors } = parsePaste(text);
+  let html = '';
+  if (results.length) {
+    html += results.map(r => {
+      const d = new Date(r.dt);
+      const end = new Date(d.getTime() + r.dur * 60000);
+      const tOpts = { hour: 'numeric', minute: '2-digit', hour12: true };
+      return `<div class="preview-ok">✓ ${r.contact} — ${d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})} · ${d.toLocaleTimeString('en-US',tOpts)} – ${end.toLocaleTimeString('en-US',tOpts)} (${r.dur} min)</div>`;
+    }).join('');
+  }
+  if (errors.length) {
+    html += errors.map(e => `<div class="preview-err">✗ ${e}</div>`).join('');
+  }
+  if (!results.length && !errors.length) html = '<div>Start typing a schedule above...</div>';
+  preview.innerHTML = html;
+}
+
+function savePaste() {
+  const text = document.getElementById('paste-input').value;
+  const { results, errors } = parsePaste(text);
+
+  if (!results.length) { alert('No valid slots found. Check the format and try again.'); return; }
+
+  const conflictNames = new Set();
+  const newSlots = results.map(r => {
+    const ns = { id: Date.now() + Math.random(), contact: r.contact, dt: r.dt, dur: r.dur, status: 'offered' };
+    slots.forEach(existing => {
+      if (existing.status !== 'declined' && overlaps(ns, existing)) conflictNames.add(existing.contact);
+    });
+    return ns;
+  });
+
+  slots = [...newSlots, ...slots];
+  save();
+
+  if (conflictNames.size) {
+    const banner = document.getElementById('conflict-banner');
+    banner.style.display = 'block';
+    banner.innerHTML = `⚠️ Some pasted times overlap with slots already offered to: <strong>${[...conflictNames].join(', ')}</strong>.`;
+    setTimeout(() => { banner.style.display = 'none'; }, 7000);
+  }
+
+  alert(`✓ ${newSlots.length} slot${newSlots.length !== 1 ? 's' : ''} added successfully!`);
+  clearPaste();
+
+  // Close paste panel
+  document.getElementById('paste-body').style.display = 'none';
+  document.getElementById('paste-arrow').textContent = '▶';
+
+  render();
+}
+
+addTimeRow();
+render();
+</script>
+</body>
+</html>

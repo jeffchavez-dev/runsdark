@@ -1,0 +1,82 @@
+Front,Back,Tags
+What is the email voice optimized for (vs. the essay voice)?,"Trust maintenance and signal efficiency. The essay voice optimizes for rhetorical force (Saxon landings, structural negation, analogy as argument).",Philosophy
+What governs the length of a GF email?,"Length matches the COMPLEXITY of the ask, not the importance of the relationship.",Philosophy
+What is the voice's single default 'instinct' (since it has no default length)?,"Say what needs saying, then stop.",Philosophy
+Three essay-voice devices that are banned in email?,"Saxon landings, ratchets, and structural negation.",Philosophy
+Why is relational softness allowed in email?,It's load-bearing — it keeps relationships alive. The essay voice would cut it.,Philosophy
+Most emails are how many sentences?,"1–5 sentences. One-sentence emails are the norm for acknowledgments, delegations, and reactions.",Philosophy
+The three addressing registers?,"1) Em dash 'Name —' (default/outreach); 2) Hyphen 'Name -' or 'Hi Name -' (warm/ongoing); 3) Formal 'Hi [Name],' (first-contact, senior).",Mechanics
+Which address style leans toward ongoing relationships vs. outreach?,Hyphen leans ongoing relationships; em dash leans outreach.,Mechanics
+Formal address example for a senior first-contact?,"'Hi Chetan,' / 'Hi Merritt,' / 'Dear Professor [Name],'",Mechanics
+What makes a subject line valid vs. a 'dangling dash'?,It must be a fragment WITH a subject. 'Today —' is dangling; 'Today — Rescheduling' is valid.,Mechanics
+When can a question be the subject line?,Only for students / young builders. E.g. 'Networking on LI since you were 7?',Mechanics
+Subject format for an intro email?,Name // Name — e.g. 'Samuel Ratnam // Luka Arnold',Mechanics
+What do you do with reply-chain subjects?,Leave them alone — don't rewrite 'Re: Meeting Follow-Up' to be clever.,Mechanics
+Three subject-line patterns to avoid?,"Dangling dash ('Today —'), throat-clearing ('Checking in'/'Touching base'), over-formal ('Regarding our conversation on [date]').",Mechanics
+The cardinal rule for openers?,"Never throat-clear. Start with substance. No 'Hope this finds you well,' no 'Just wanted to follow up.'",Mechanics
+How does an internal email open?,No opener — start with the directive.,Mechanics
+A good researcher cold-open?,"'Spotted you're attending NeurIPS.' / 'I'm a Stanford '20, so I hope you don't mind the cold outreach.'",Mechanics
+A good congratulations/compliment opener?,'You are an absolutely G' / 'Thrilled for you' / 'This is fantastic',Mechanics
+Allowed sign-offs?,"'Best,' (formal/external), 'Sincerely,' (passes), a one-line warm closer ('Looking forward to March.'), or no sign-off / just the name on quick replies.",Mechanics
+Banned sign-offs?,"'Best regards,', 'Cheers,', 'Warm regards,', 'Talk soon' as a standalone.",Mechanics
+Which CTA does GF NEVER use?,Any scheduling-tool CTA — never 'book a 30-min call' or 'here's my Calendly.',Mechanics
+What CTA does GF use for outreach instead?,Offer the cell as low-friction: 'Here's my cell if easier: 408-612-5439.' It signals accessibility and seriousness.,Mechanics
+Which recipient gets the WARMEST register?,Portfolio founders (active). Personal context weaves in; relational language is load-bearing.,Tone
+"Tone for internal team (Nazli, Jeff)?","Terse, directive, no pleasantries.",Tone
+Tone for stakeholders / LPs?,"Warm but direct; acknowledge input, name specific actions, give the 'why' in longer emails. Softness is strategic.",Tone
+Tone for students / young builders?,"Most casual; self-deprecating humor; position yourself to LEARN from them, not pitch; P.S. hooks; slang and emoji relaxed.",Tone
+Tone for peer / downstream VCs?,"Thesis-led, not research-led. Hook = 'I think about the market the same way you do.' Use the '[Fund]-ready' framework.",Tone
+Co-GP (Eric) email: how do you open and what do you cut?,"Lead with agreement ('I largely agree,' not 'I agree'), push back on exactly one thing with evidence, end with a question giving him agency. CUT anything he already said.",Tone
+Why use 'I largely agree' instead of 'I agree' with the co-GP?,It leaves room for your reframe / pushback without contradicting him.,Tone
+Cold outreach to researchers: questions or pitches?,"Questions, not pitches — positions GF as intellectually curious, not transactional.",Types
+The 5 parts of a researcher cold email?,"Hook line, research reference, genuine question(s), the ask ('25-minute chat at [Conf]?'), compact credential block with follow-on investors named.",Types
+"In the researcher email, what must the credential block name?",Portfolio companies WITH their follow-on investors (e.g. Haize Labs — General Catalyst-backed).,Types
+Student/builder outreach: what makes the hook acceptable?,"It must be SPECIFIC (a project, paper, hobby, mutual connection). Generic = delete.",Types
+What element of student/builder outreach often gets the reply?,"The P.S. line with a personal detail signaling research depth (e.g. 'P.S. ... I'd be happy to be customer #10,001.').",Types
+Slush / downstream-VC outreach: is the personal hook optional?,"No — every Slush email that got a response had one (dorm, geography, IB, specific personal detail).",Types
+The fixed 'ask' in a Slush downstream-VC email?,"'I'd love to understand what [Fund]-ready looks like today, so that when something fits I'm only sending you the 1–2 companies a year worth your time.'",Types
+Surprising insight from the Slush batch?,"The highest-caliber people responded MORE, not less. Thesis-led beats generic every time.",Types
+Two non-negotiables of an intro email?,LinkedIn links are mandatory; credential density is the currency.,Types
+How does an intro email close?,'I'll leave it to you to connect directly.',Types
+Intro Menu / Promises Note — link format?,Raw URLs in parentheses after names (visible links beat hidden Markdown — the email is meant to be scanned and forwarded).,Types
+How do you soften a speculative intro in a promises note?,"'Likely a good path,' 'happy to see how he can be helpful,' 'worth comparing notes.' Don't oversell.",Types
+The signature phrase in the cold pass?,"'I view my role as an early-stage, pre-seed investor as a custodian of potential.'",Types
+The key 'no' line in the cold pass?,"'Given the trust that founders give me to join their cap table, I must say no to excellent opportunities, even ones like yours.'",Types
+How does the cold pass close (sign-off + sentiment)?,"'You deserve a wonderful fundraising experience.' then 'Sincerely,'",Types
+What does the cold-pass template accomplish?,"Says no without closing the door — positions the pass as a function of process, not judgment.",Types
+Portfolio logistics email: how do you state the plan?,With a back-reference to the conversation that generated it: 'per our discussion last night.',Types
+Two phrases that signal respect for a founder's judgment in coaching?,'I think' and 'my sense is.',Types
+Are bullets allowed in email? When?,Yes — for multi-topic follow-ups. (Banned in the essay voice.) Each bullet self-contained: bold label + em dash + 1–3 sentences.,Types
+Article/link share: the critical structural move?,A labeled summary block ('The gist:') in a blockquote — marks it as NOT your words — with your one-line reaction OUTSIDE the quote.,Types
+Why must the link-share summary sit in a blockquote?,"Without the separation a 2-paragraph summary reads as you lecturing; with it, the reader's attention lands on your reaction, not the summary.",Types
+Operational/internal email format?,"No greeting, no sign-off. One job — state it and stop.",Types
+Why is 'Please review' an incomplete delegation?,"It lacks specificity. 'Please review and see if any are worth meeting with, either together or separately' is actionable.",Types
+Is the analytical/thesis email terse?,"No — the voice expands significantly. It tolerates longer paragraphs, semicolons, and parenthetical asides.",Types
+List the epistemic-hedge phrases that mark the analytical voice.,"'I believe,' 'Perhaps,' 'appears as,' 'I think it's worth,' 'gives me some confidence.' They signal reasoning-in-progress, not a concluded memo.",Types
+'Single-topic discipline' means what?,"Each analytical email delivers ONE insight the recipient doesn't already have, then stops. Multiple concerns = multiple emails.",Types
+Where does supporting evidence go in an analytical email?,"Its own standalone paragraph, so it can breathe and land on its own (e.g. the $3B private-credit fund example).",Types
+"When you're unsure of a conclusion, how do you frame it?","As a question, not an assertion: 'Perhaps his first 10–50 customers won't require brand trust?'",Types
+Where do validation/next-step references go?,Inside parentheticals: '(wanted to confirm this via AlphaSights !)' — shows verification without making it the subject.,Types
+Co-GP email: what must you NOT do with their flagged concerns?,Never restate their concerns back to them. Add information they don't have or shift a frame — agreement is implicit in acting on it.,Types
+How does a co-GP email end?,With a question that gives the co-GP agency (e.g. 'Curious whether this reframe is worth a quick pass to Prasanna').,Types
+Advisor/evaluator response: how much do you summarize their work back?,"Don't. Open with one line of appreciation, translate their framework into your own words, add exactly ONE new piece of info, close with the next input coming. 5–7 short paragraphs max.",Types
+Adverbs to scan for and cut before sending?,"genuinely, truly, incredibly, absolutely, fundamentally, basically, actually.",Rules
+Forbidden buzzwords (name several)?,"leverage (verb), optimize, solution(s), seamless, robust, innovative, transform/transformative, synergy, journey, unlock, ecosystem, disruptive, scalable.",Rules
+Three 'false intimacy' phrases that are banned?,"'Here's the thing,' 'Let me be real,' 'The truth is.'",Rules
+Preferred word for 'utilize'? 'optimize'? 'implement'?,use; improve; build.,Rules
+Preferred word for 'demonstrate'? 'facilitate'? 'embark'?,prove/show; help; start.,Rules
+Is 'Hope all is well' ever allowed?,Only as a brief tag — never as an opener.,Rules
+Which emoji is for internal quick acknowledgments only?,🤝,Rules
+Reasoning-in-progress connectors — name a few and their job.,"'Put differently,' 'In other words,' 'Which is to say,' 'The point being,' 'To be clear' — the seam between what you said and the sharper version. Use when distilling, not extending.",Rules
+"Are personal qualifiers ('I have a preference for,' 'my sense is') hedges?",No — they're relational markers. 'I guess I disagree' is more honest than 'I disagree.',Rules
+Top Humanizer rule for avoiding AI-sounding prose?,Vary sentence length dramatically — mix 3-word punches with longer flowing ones; occasional fragments / em-dashes.,Humanizer
+Humanizer rule when writing a BATCH of outreach?,Never use the same hook structure twice — vary the opening (Stanford / paper / personal detail / mutual connection).,Humanizer
+'Proactive context addition' — what is it?,"When coordinating multiple parties, anticipate what each needs and include it unasked: 'Nazli will join us' / 'Nazli will circulate calendar options once you send your business address.'",Humanizer
+'Logistics chaining' — what is it?,"Chain multiple action items in natural flow rather than bullet-pointing: 'Let's plan for X, per our discussion. [Person] will join. [Person] will handle [next step] once you [your part]. Ahead of [event], please bring [prep].'",Humanizer
+Why prefer 'I believe Katharos is selling productivity gains' over the flat assertion?,"First person + belief verb signals it's your read, not settled fact — reasoning-in-progress. (Distinct from the more declarative cold-outreach voice.)",Humanizer
+The #1 AI failure mode these emails must avoid?,Restating someone's own analysis back to them. Add one new thing instead — agreement is implicit in acting on it.,Anti-patterns
+'Action > announcement' means what?,Never narrate your to-do list ('I'll pursue the call you recommended'). The recipient sees the intro when you make it.,Anti-patterns
+Why not list technical details to prove you understood?,It reads as proving you read the doc. 'Proprietary ER graph' is enough — trust the recipient to ask for specifics.,Anti-patterns
+What must an intro menu never become?,"A diligence memo — no uncertainty log, no full bio for every person. Just the shortlist, links, and next handle.",Anti-patterns
+The voice progression across the sample sets (formal → target)?,"ICML (formal, longer) → NeurIPS (tighter, more personality) → LinkedIn/Boston (punchiest, most human) → Slush VC (thesis-led, heaviest credentials). Later = target voice.",Philosophy
+"Which reference file matters most, per the skill?","references/samples.md — 'If you only read one reference, read that one.'",Philosophy
