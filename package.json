@@ -1,19 +1,12 @@
 {
-  "name": "runsdark-monorepo",
+  "name": "runsdark",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@9.0.0",
-  "workspaces": [
-    "apps/web",
-    "packages/db"
-  ],
   "scripts": {
-    "dev": "turbo run dev",
-    "build": "turbo run build",
-    "lint": "turbo run lint",
-    "type-check": "turbo run type-check"
-  },
-  "devDependencies": {
-    "turbo": "^2.0.0"
+    "dev": "cd apps/web && npm run dev",
+    "build": "cd apps/web && npm run build",
+    "start": "cd apps/web && npm start",
+    "lint": "cd apps/web && npm run lint",
+    "type-check": "cd apps/web && npm run type-check"
   }
 }
