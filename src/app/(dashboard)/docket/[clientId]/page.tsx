@@ -5,7 +5,7 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import {
   Plus, Trash2, Check, ChevronDown, ChevronRight, Star, X,
   Search, MessageSquare, Clock3, RefreshCw, AlertTriangle, Circle,
-  Inbox, ListChecks, Layers
+  Inbox, ListChecks, Layers, PanelLeft, PanelRight
 } from "lucide-react";
 
 const STATUS = {
@@ -33,6 +33,8 @@ export default function DocketPage({ params }: { params: { clientId: string } })
   const [newSubtaskText, setNewSubtaskText] = useState<Record<string, string>>({});
   const [newCommentText, setNewCommentText] = useState<Record<string, string>>({});
   const [groupMenuOpen, setGroupMenuOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [detailPanelOpen, setDetailPanelOpen] = useState(true);
   const menuRef = useRef<HTMLDivElement>(null);
   const utils = trpc.useUtils();
 
@@ -192,6 +194,7 @@ export default function DocketPage({ params }: { params: { clientId: string } })
   return (
     <div className="flex gap-4 h-full -mx-6 -my-6 px-6 py-6">
       {/* Sidebar */}
+      {sidebarOpen && (
       <div className="w-56 flex-shrink-0 space-y-6 pr-4 border-r border-bg-border">
         <div className="space-y-2">
           {[
@@ -217,6 +220,7 @@ export default function DocketPage({ params }: { params: { clientId: string } })
           })}
         </div>
       </div>
+      )}
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
@@ -260,6 +264,22 @@ export default function DocketPage({ params }: { params: { clientId: string } })
                 </div>
               )}
             </div>
+
+            {/* Toggle Buttons */}
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="flex items-center gap-2 px-3 py-2 bg-bg-surface border border-bg-border rounded-lg text-text-secondary hover:text-text-primary transition-colors"
+              title={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
+            >
+              <PanelLeft size={16} />
+            </button>
+            <button
+              onClick={() => setDetailPanelOpen(!detailPanelOpen)}
+              className="flex items-center gap-2 px-3 py-2 bg-bg-surface border border-bg-border rounded-lg text-text-secondary hover:text-text-primary transition-colors"
+              title={detailPanelOpen ? "Hide details" : "Show details"}
+            >
+              <PanelRight size={16} />
+            </button>
           </div>
         )}
 
@@ -469,7 +489,7 @@ export default function DocketPage({ params }: { params: { clientId: string } })
       </div>
 
       {/* Detail Panel */}
-      {selected && (
+      {selected && detailPanelOpen && (
         <div className="w-80 flex-shrink-0 pl-4 border-l border-bg-border space-y-4 overflow-y-auto">
           <div className="flex items-start justify-between">
             <input
