@@ -13,8 +13,14 @@ export default async function DashboardPage() {
 
   if (user) {
     try {
+      // Use service role key to bypass RLS for stats fetching
+      const serviceRoleClient = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+      );
+
       // Get public user ID
-      const { data: publicUser } = await supabase
+      const { data: publicUser } = await serviceRoleClient
         .from("users")
         .select("id")
         .eq("supabase_id", user.id)
@@ -22,7 +28,7 @@ export default async function DashboardPage() {
 
       if (publicUser) {
         // Get clients count
-        const { count: clientCount } = await supabase
+        const { count: clientCount } = await serviceRoleClient
           .from("clients")
           .select("*", { count: "exact", head: true })
           .eq("user_id", publicUser.id);
@@ -30,7 +36,7 @@ export default async function DashboardPage() {
         clientsCount = clientCount || 0;
 
         // Get active tasks count (not done)
-        const { count: taskCount } = await supabase
+        const { count: taskCount } = await serviceRoleClient
           .from("tasks")
           .select("*", { count: "exact", head: true })
           .eq("user_id", publicUser.id)
@@ -39,7 +45,7 @@ export default async function DashboardPage() {
         tasksCount = taskCount || 0;
 
         // Get upcoming bookings count (pending or confirmed)
-        const { count: bookingCount } = await supabase
+        const { count: bookingCount } = await serviceRoleClient
           .from("bookings")
           .select("*", { count: "exact", head: true })
           .eq("user_id", publicUser.id)
