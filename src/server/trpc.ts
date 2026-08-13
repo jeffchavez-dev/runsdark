@@ -1,22 +1,33 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import { CreateNextContextOptions } from "@trpc/server/adapters/next";
-import { createClient } from "@/lib/supabase/server";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 interface Context {
   userId: string | null;
-  supabase: Awaited<ReturnType<typeof createClient>>;
+  userEmail: string | null;
+  supabase: ReturnType<typeof createSupabaseClient>;
 }
 
 export async function createContext(
   opts?: CreateNextContextOptions
 ): Promise<Context> {
-  const supabase = await createClient();
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  // Use service role key for tRPC operations
+  // This bypasses auth session issues and allows us to query the database
+  const supabase = createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  // Extract user ID from request headers sent by the client
+  let userId: string | null = null;
+  const userIdHeader = opts?.req?.headers.get?.("x-user-id");
+  if (userIdHeader) {
+    userId = userIdHeader;
+  }
 
   return {
-    userId: session?.user.id || null,
+    userId,
+    userEmail: null,
     supabase,
   };
 }

@@ -18,7 +18,7 @@ export async function createClient() {
               cookieStore.set(name, value, options as CookieOptions)
             );
           } catch {
-            // Handle errors gracefully in server components
+            // Handle errors gracefully
           }
         },
       },

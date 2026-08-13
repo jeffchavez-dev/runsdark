@@ -14,11 +14,11 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
 const navItems = [
-  { label: "Dashboard", href: "/app/dashboard", icon: LayoutDashboard },
-  { label: "Clients", href: "/app/clients", icon: Users },
-  { label: "EDrafting", href: "/app/edrafting", icon: Mail },
-  { label: "Calendar", href: "/app/calendar", icon: Calendar },
-  { label: "Travel", href: "/app/travel", icon: Briefcase },
+  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Clients", href: "/clients", icon: Users },
+  { label: "EDrafting", href: "/edrafting", icon: Mail },
+  { label: "Calendar", href: "/calendar", icon: Calendar },
+  { label: "Travel", href: "/travel", icon: Briefcase },
 ];
 
 export function Sidebar() {
@@ -35,7 +35,7 @@ export function Sidebar() {
     <div className="w-60 bg-bg-surface border-r border-bg-border h-screen flex flex-col">
       {/* Logo */}
       <div className="p-6 border-b border-bg-border">
-        <Link href="/app/dashboard" className="text-xl font-bold text-white">
+        <Link href="/dashboard" className="text-xl font-bold text-white">
           RunsDark
         </Link>
       </div>

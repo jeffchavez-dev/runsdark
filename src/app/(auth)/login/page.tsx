@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { trpc } from "@/lib/trpc/client";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -14,6 +15,7 @@ export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClient();
+  const syncUser = trpc.users.sync.useMutation();
 
   useEffect(() => {
     const msg = searchParams.get("message");
@@ -35,11 +37,20 @@ export default function LoginPage() {
 
       if (error) {
         setError(error.message);
+        setLoading(false);
         return;
       }
 
+      // Sync user to public.users table
+      try {
+        await syncUser.mutateAsync();
+      } catch (syncErr) {
+        console.error("Failed to sync user:", syncErr);
+        // Continue anyway - user is authenticated
+      }
+
       // On successful login, redirect to dashboard
-      router.push("/app/dashboard");
+      router.push("/dashboard");
     } catch (err) {
       setError("An error occurred. Please try again.");
     } finally {

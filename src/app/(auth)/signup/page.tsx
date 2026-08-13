@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { trpc } from "@/lib/trpc/client";
 
 export default function SignUpPage() {
   const [email, setEmail] = useState("");
@@ -12,6 +13,7 @@ export default function SignUpPage() {
   const [error, setError] = useState("");
   const router = useRouter();
   const supabase = createClient();
+  const syncUser = trpc.users.sync.useMutation();
 
   async function handleSignUp(e: React.FormEvent) {
     e.preventDefault();
@@ -29,11 +31,30 @@ export default function SignUpPage() {
 
       if (error) {
         setError(error.message);
+        setLoading(false);
         return;
       }
 
-      // On successful signup, redirect to login with message
-      router.push("/login?message=Check your email to confirm your account");
+      // Sign in immediately after signup to sync user
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (!signInError) {
+        // Sync user to public.users table
+        try {
+          await syncUser.mutateAsync();
+        } catch (syncErr) {
+          console.error("Failed to sync user:", syncErr);
+        }
+
+        // Redirect to dashboard
+        router.push("/dashboard");
+      } else {
+        // Sign up succeeded but sign in failed, redirect to login
+        router.push("/login?message=Check your email to confirm your account");
+      }
     } catch (err) {
       setError("An error occurred. Please try again.");
     } finally {

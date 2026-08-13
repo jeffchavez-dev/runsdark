@@ -1,12 +1,15 @@
 import { router, protectedProcedure } from "@/server/trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
+import { getPublicUserId } from "@/server/utils/user-lookup";
 
 export const docketRouter = router({
   // List all tasks for a specific client
   listTasks: protectedProcedure
     .input(z.object({ clientId: z.string().uuid() }))
     .query(async ({ ctx, input }) => {
+      const publicUserId = await getPublicUserId(ctx.supabase, ctx.userId);
+
       const { data, error } = await ctx.supabase
         .from("tasks")
         .select(
@@ -26,7 +29,7 @@ export const docketRouter = router({
           task_comments(id, text, created_at)
         `
         )
-        .eq("user_id", ctx.userId)
+        .eq("user_id", publicUserId)
         .eq("client_id", input.clientId)
         .order("created_at", { ascending: false });
 
@@ -44,15 +47,19 @@ export const docketRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const publicUserId = await getPublicUserId(ctx.supabase, ctx.userId);
+
       const { data, error } = await ctx.supabase
         .from("tasks")
         .insert([
           {
-            user_id: ctx.userId,
+            user_id: publicUserId,
             client_id: input.clientId,
             title: input.title,
-            description: input.description,
+            description: input.description || null,
             status: "not_started",
+            priority: 0,
+            starred: false,
           },
         ])
         .select()
@@ -71,6 +78,8 @@ export const docketRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const publicUserId = await getPublicUserId(ctx.supabase, ctx.userId);
+
       const { data, error } = await ctx.supabase
         .from("tasks")
         .update({
@@ -78,7 +87,7 @@ export const docketRouter = router({
           completed_at: input.status === "done" ? new Date().toISOString() : null,
         })
         .eq("id", input.taskId)
-        .eq("user_id", ctx.userId)
+        .eq("user_id", publicUserId)
         .select()
         .single();
 
@@ -95,11 +104,13 @@ export const docketRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const publicUserId = await getPublicUserId(ctx.supabase, ctx.userId);
+
       const { data, error } = await ctx.supabase
         .from("tasks")
         .update({ priority: input.priority })
         .eq("id", input.taskId)
-        .eq("user_id", ctx.userId)
+        .eq("user_id", publicUserId)
         .select()
         .single();
 
@@ -111,11 +122,13 @@ export const docketRouter = router({
   toggleTaskStar: protectedProcedure
     .input(z.object({ taskId: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
+      const publicUserId = await getPublicUserId(ctx.supabase, ctx.userId);
+
       const { data: task } = await ctx.supabase
         .from("tasks")
         .select("starred")
         .eq("id", input.taskId)
-        .eq("user_id", ctx.userId)
+        .eq("user_id", publicUserId)
         .single();
 
       const newStarred = task?.starred === "true" ? "false" : "true";
@@ -124,7 +137,7 @@ export const docketRouter = router({
         .from("tasks")
         .update({ starred: newStarred })
         .eq("id", input.taskId)
-        .eq("user_id", ctx.userId)
+        .eq("user_id", publicUserId)
         .select()
         .single();
 
@@ -136,11 +149,13 @@ export const docketRouter = router({
   deleteTask: protectedProcedure
     .input(z.object({ taskId: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
+      const publicUserId = await getPublicUserId(ctx.supabase, ctx.userId);
+
       const { error } = await ctx.supabase
         .from("tasks")
         .delete()
         .eq("id", input.taskId)
-        .eq("user_id", ctx.userId);
+        .eq("user_id", publicUserId);
 
       if (error) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
       return { success: true };

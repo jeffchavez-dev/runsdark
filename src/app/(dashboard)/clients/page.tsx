@@ -1,9 +1,9 @@
 "use client";
 
-import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Plus, Users } from "lucide-react";
+import { trpc } from "@/lib/trpc/client";
 
 interface Client {
   id: string;
@@ -16,38 +16,19 @@ export default function ClientsPage() {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const supabase = createClient();
+
+  const { data, isLoading, error: queryError } = trpc.clients.listClients.useQuery();
 
   useEffect(() => {
-    const loadClients = async () => {
-      try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-
-        if (!user) return;
-
-        const { data, error } = await supabase
-          .from("clients")
-          .select("*")
-          .eq("user_id", user.id)
-          .order("created_at", { ascending: false });
-
-        if (error) {
-          setError(error.message);
-          return;
-        }
-
-        setClients(data || []);
-      } catch (err) {
-        setError("Failed to load clients");
-      } finally {
-        setLoading(false);
+    if (!isLoading) {
+      if (queryError) {
+        setError(queryError.message);
+      } else if (data) {
+        setClients(data);
       }
-    };
-
-    loadClients();
-  }, []);
+      setLoading(false);
+    }
+  }, [data, isLoading, queryError]);
 
   if (loading)
     return (
@@ -93,7 +74,7 @@ export default function ClientsPage() {
           {clients.map((client) => (
             <Link
               key={client.id}
-              href={`/app/docket/${client.id}`}
+              href={`/docket/${client.id}`}
               className="p-6 rounded-lg bg-bg-surface border border-bg-border hover:border-accent-primary/30 transition-colors cursor-pointer group"
             >
               <h3 className="text-lg font-semibold text-white group-hover:text-accent-primary transition-colors">
