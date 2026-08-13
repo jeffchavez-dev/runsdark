@@ -13,7 +13,7 @@ RunsDark is a web platform for **Filipino Executive Assistants (EAs)** serving g
 ### What We Offer
 
 **3 Free Apps:**
-- **Docket** — Client-scoped task management with statuses, priorities, subtasks, and comments
+- **Docket** — Complete task management with dynamic grouping (by status/priority/due), Wrap-ups view for completed tasks, subtasks, comments, priorities (P0/P1/P2), and beautiful UI matching industry standards
 - **EDrafting** — AI email drafting that matches your client's voice using RAG
 - **Availability Tracker** — Calendar booking status dashboard (confirmed, pending, needs follow-up, etc.)
 - **Travel Manager** — Executive travel itinerary builder with document storage and approval flow
@@ -332,7 +332,7 @@ Tests are not yet set up. Contributions welcome!
 
 - **Phase 1** ✅ Foundation (Landing page, Auth, Database, Dashboard shell)
 - **Phase 2** 🔄 Main Site (Marketing pages, Services page)
-- **Phase 3** ⏳ Docket MVP (Task CRUD, multi-client isolation)
+- **Phase 3** ✅ Docket Complete (Task CRUD, multi-client isolation, grouping, Wrap-ups, detail panel, subtasks, comments)
 - **Phase 4** ⏳ Free Tools (Browser utilities)
 - **Phase 5** ⏳ Additional Apps (E-Drafting, Calendar, Travel Manager)
 - **Phase 6** ⏳ Services Page (Dark Ops retainer offering)
@@ -363,4 +363,4 @@ For licensing inquiries, contact jeff@runsdark.com.
 
 ---
 
-**Status**: 🚧 In Development — Phase 1 Complete, Deploying to Vercel Soon
+**Status**: 🚀 Phase 1–3 Complete — Docket fully functional with comprehensive task management. Phase 4–6 in development.

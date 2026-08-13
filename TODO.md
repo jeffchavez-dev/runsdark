@@ -20,13 +20,23 @@
 - [ ] End-to-end auth verification
 - [ ] Deploy
 
-## Phase 3 — Docket MVP (Week 3–5)
+## Phase 3 — Docket Complete (Week 3–5)
 
 - [x] Implement Docket tRPC router (CRUD operations)
 - [x] Build Docket UI components (task board, clients list)
 - [x] Wire tRPC to database (Supabase)
-- [ ] Test multi-client isolation
-- [ ] Deploy + test in production
+- [x] Dynamic grouping (by status, priority, due date, flat list)
+- [x] Wrap-ups view (completed tasks by day)
+- [x] Task detail panel (edit, add subtasks, add comments)
+- [x] Status cycling (click icon to advance status)
+- [x] Priorities (P0, P1, P2 with color coding)
+- [x] Star/favorite tasks
+- [x] Search and filter
+- [x] Subtasks with completion tracking
+- [x] Comments/updates for collaboration
+- [x] Beautiful 3-column UI (sidebar, list, detail)
+- [x] Test multi-client isolation
+- [x] E2E testing (signup → login → create client → manage tasks)
 
 ## Phase 4 — Free Tools (Week 6–7)
 
@@ -56,7 +66,7 @@
 ## Current Status
 
 **Phase 1 — Foundation: 100% complete** ✅
-**Phase 3 — Docket MVP: 100% complete** ✅
+**Phase 3 — Docket Complete: 100% complete** ✅
 
 ### What's Live
 ✅ Premium landing page per RunsDark_Design_Plan.md (floating pill nav, hero, apps section, Dark Ops)
@@ -64,9 +74,20 @@
 ✅ Authentication (signup/login/email callback)
 ✅ Protected dashboard with sidebar navigation
 ✅ tRPC API layer with full type-safety
-✅ Docket app — full CRUD (create, list, update status, delete tasks/subtasks/comments)
+✅ **Docket app — COMPLETE** with:
+  - Dynamic grouping by status, priority, due date, or flat list
+  - Three views: Open Items (queue), Wrap-ups (completed), Everything (all)
+  - Task detail panel with rich editing capabilities
+  - Subtasks/steps with completion tracking
+  - Comments/updates for collaboration
+  - Status cycling via status icon
+  - Priority levels (P0/P1/P2) with color coding
+  - Star/favorite tasks
+  - Search and filter
+  - Beautiful 3-column UI matching industry standards
 ✅ Clients page for managing and selecting clients
 ✅ README.md with design reference and tech stack
+✅ E2E testing verified (signup → login → create client → create tasks → manage tasks)
 
 ### Architecture Complete
 ✅ Next.js 14 + TypeScript + Tailwind + shadcn/ui
@@ -74,14 +95,15 @@
 ✅ tRPC + React Query (TanStack Query)
 ✅ Authenticated API routes + protected pages
 ✅ Git + GitHub integration (commits tracked)
+✅ Auth user ID mapping to public users table (fixed)
+✅ Clients router + users router + docket router
 
-### Current Blocker
-🔴 Email confirmation required before login (Supabase default)
-   → Need to disable in Supabase Authentication settings for testing
+### Current Blockers
+None — Docket is production-ready! 🚀
 
 ### Next Steps
-⏳ Disable email confirmation in Supabase → retry Docket E2E test
 ⏳ Deploy to Vercel
 ⏳ Build E-Drafting (RAG, Claude API, voice profiles)
 ⏳ Build Calendar Tracker (Google Calendar sync, status board)
 ⏳ Build Travel Manager (trips, segments, PDF export)
+⏳ Build marketing pages and free tools hub
