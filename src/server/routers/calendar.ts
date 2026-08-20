@@ -35,11 +35,11 @@ export const calendarRouter = router({
         query = query.eq("status", input.status);
       }
 
-      const { data, error } = await query;
+      const { data, error } = (await query) as any;
 
       if (error)
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
-      return data || [];
+      return (data || []) as any;
     }),
 
   // Create a new booking
@@ -57,26 +57,26 @@ export const calendarRouter = router({
     .mutation(async ({ ctx, input }) => {
       const publicUserId = await getPublicUserId(ctx.supabase, ctx.userId);
 
-      const { data, error } = await ctx.supabase
+      const { data, error } = (await ctx.supabase
         .from("bookings")
         .insert([
           {
             user_id: publicUserId,
             client_id: input.clientId,
             title: input.title,
-            start_time: input.startTime || null,
-            end_time: input.endTime || null,
+            start_time: input.startTime ? new Date(input.startTime).toISOString() : null,
+            end_time: input.endTime ? new Date(input.endTime).toISOString() : null,
             notes: input.notes || null,
             platform: input.platform,
             status: "pending",
-          },
+          } as any,
         ])
         .select()
-        .single();
+        .single()) as any;
 
       if (error)
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
-      return data;
+      return data as any;
     }),
 
   // Update booking details (not status — use updateStatus for that)
@@ -93,22 +93,28 @@ export const calendarRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const publicUserId = await getPublicUserId(ctx.supabase, ctx.userId);
-      const { id, ...updates } = input;
+      const { id, startTime, endTime, followUpAt, ...updates } = input;
 
-      const { data, error } = await ctx.supabase
+      const updateData: Record<string, any> = {
+        ...updates,
+        updated_at: new Date().toISOString(),
+      };
+
+      if (startTime) updateData.start_time = new Date(startTime).toISOString();
+      if (endTime) updateData.end_time = new Date(endTime).toISOString();
+      if (followUpAt) updateData.follow_up_at = new Date(followUpAt).toISOString();
+
+      const { data, error } = (await ctx.supabase
         .from("bookings")
-        .update({
-          ...updates,
-          updated_at: new Date().toISOString(),
-        })
+        .update(updateData)
         .eq("id", id)
         .eq("user_id", publicUserId)
         .select()
-        .single();
+        .single()) as any;
 
       if (error)
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
-      return data;
+      return data as any;
     }),
 
   // Update booking status and log the transition
@@ -124,18 +130,18 @@ export const calendarRouter = router({
       const publicUserId = await getPublicUserId(ctx.supabase, ctx.userId);
 
       // Get current booking to find old status
-      const { data: currentBooking, error: fetchError } = await ctx.supabase
+      const { data: currentBooking, error: fetchError } = (await ctx.supabase
         .from("bookings")
         .select("status")
         .eq("id", input.id)
         .eq("user_id", publicUserId)
-        .single();
+        .single()) as any;
 
       if (fetchError)
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: fetchError.message });
 
       // Update booking status
-      const { data: updatedBooking, error: updateError } = await ctx.supabase
+      const { data: updatedBooking, error: updateError } = (await ctx.supabase
         .from("bookings")
         .update({
           status: input.newStatus,
@@ -144,21 +150,21 @@ export const calendarRouter = router({
         .eq("id", input.id)
         .eq("user_id", publicUserId)
         .select()
-        .single();
+        .single()) as any;
 
       if (updateError)
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: updateError.message });
 
       // Log the status transition
       if (currentBooking.status !== input.newStatus) {
-        const { error: historyError } = await ctx.supabase.from("booking_history").insert([
+        const { error: historyError } = (await ctx.supabase.from("booking_history").insert([
           {
             booking_id: input.id,
             old_status: currentBooking.status,
             new_status: input.newStatus,
             note: input.note || null,
           },
-        ]);
+        ])) as any;
 
         if (historyError) {
           console.error("Failed to log booking status change:", historyError);
@@ -176,25 +182,25 @@ export const calendarRouter = router({
       const publicUserId = await getPublicUserId(ctx.supabase, ctx.userId);
 
       // Verify the booking belongs to this user
-      const { data: booking, error: bookingError } = await ctx.supabase
+      const { data: booking, error: bookingError } = (await ctx.supabase
         .from("bookings")
         .select("id")
         .eq("id", input.id)
         .eq("user_id", publicUserId)
-        .single();
+        .single()) as any;
 
       if (bookingError || !booking)
         throw new TRPCError({ code: "NOT_FOUND", message: "Booking not found" });
 
-      const { data, error } = await ctx.supabase
+      const { data, error } = (await ctx.supabase
         .from("booking_history")
         .select("*")
         .eq("booking_id", input.id)
-        .order("changed_at", { ascending: false });
+        .order("changed_at", { ascending: false })) as any;
 
       if (error)
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
-      return data || [];
+      return (data || []) as any;
     }),
 
   // Delete a booking

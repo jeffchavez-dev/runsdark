@@ -1,15 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { formatDistanceToNow, format } from 'date-fns';
+import { format } from 'date-fns';
 import { ChevronDown, Trash2, Edit2 } from 'lucide-react';
 import { StatusBadge } from './status-badge';
 
 interface BookingCardProps {
-  id: string;
   title: string;
   startTime?: string;
-  endTime?: string;
   status: 'confirmed' | 'pending' | 'needs_followup' | 'rescheduled' | 'cancelled' | 'conflict';
   notes?: string;
   onStatusChange: (newStatus: typeof status) => void;
@@ -20,10 +18,8 @@ interface BookingCardProps {
 const statuses = ['pending', 'confirmed', 'needs_followup', 'rescheduled', 'cancelled', 'conflict'] as const;
 
 export function BookingCard({
-  id,
   title,
   startTime,
-  endTime,
   status,
   notes,
   onStatusChange,

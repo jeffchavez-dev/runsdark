@@ -26,7 +26,8 @@ export default function CalendarPage() {
   const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
 
   // Get clients list to show dropdown
-  const { data: clients = [] } = trpc.clients.listClients.useQuery();
+  const { data: clientsData = [] } = trpc.clients.listClients.useQuery();
+  const clients = clientsData as Array<{ id: string; name: string; company?: string }>;
   const selectedClient = clients.find((c) => c.id === clientId);
 
   // Fetch bookings for selected client
@@ -50,11 +51,14 @@ export default function CalendarPage() {
     }
   }, [fetchedBookings]);
 
+  // Query client for invalidation
+  const utils = trpc.useUtils();
+
   // Mutations
   const createMutation = trpc.calendar.createBooking.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       if (clientId) {
-        trpc.calendar.listBookings.invalidateQueries({ clientId });
+        await utils.calendar.listBookings.invalidate({ clientId });
       }
       setIsFormOpen(false);
       setEditingBooking(null);
@@ -62,9 +66,9 @@ export default function CalendarPage() {
   });
 
   const updateMutation = trpc.calendar.updateBooking.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       if (clientId) {
-        trpc.calendar.listBookings.invalidateQueries({ clientId });
+        await utils.calendar.listBookings.invalidate({ clientId });
       }
       setIsFormOpen(false);
       setEditingBooking(null);
@@ -72,17 +76,17 @@ export default function CalendarPage() {
   });
 
   const statusMutation = trpc.calendar.updateStatus.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       if (clientId) {
-        trpc.calendar.listBookings.invalidateQueries({ clientId });
+        await utils.calendar.listBookings.invalidate({ clientId });
       }
     },
   });
 
   const deleteMutation = trpc.calendar.deleteBooking.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       if (clientId) {
-        trpc.calendar.listBookings.invalidateQueries({ clientId });
+        await utils.calendar.listBookings.invalidate({ clientId });
       }
     },
   });

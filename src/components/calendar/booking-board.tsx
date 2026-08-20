@@ -19,14 +19,14 @@ interface BookingBoardProps {
   isLoading?: boolean;
 }
 
-const columns = [
+const columns: Array<{ id: Booking['status']; label: string }> = [
   { id: 'pending', label: 'Pending' },
   { id: 'confirmed', label: 'Confirmed' },
   { id: 'needs_followup', label: 'Needs Followup' },
   { id: 'rescheduled', label: 'Rescheduled' },
   { id: 'conflict', label: 'Conflict' },
   { id: 'cancelled', label: 'Cancelled' },
-] as const;
+];
 
 export function BookingBoard({
   bookings,
@@ -35,7 +35,7 @@ export function BookingBoard({
   onDelete,
   isLoading,
 }: BookingBoardProps) {
-  const getBookingsByStatus = (status: string) => {
+  const getBookingsByStatus = (status: Booking['status']) => {
     return bookings.filter((b) => b.status === status);
   };
 
@@ -47,7 +47,7 @@ export function BookingBoard({
     <div className="overflow-x-auto pb-4">
       <div className="flex gap-4 min-w-full pr-4">
         {columns.map((column) => {
-          const columnBookings = getBookingsByStatus(column.id);
+          const columnBookings = getBookingsByStatus(column.id as Booking['status']);
           return (
             <div key={column.id} className="flex-shrink-0 w-72">
               {/* Column header */}
