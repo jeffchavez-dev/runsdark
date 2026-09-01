@@ -57,20 +57,20 @@ export const calendarRouter = router({
     .mutation(async ({ ctx, input }) => {
       const publicUserId = await getPublicUserId(ctx.supabase, ctx.userId);
 
+      const bookingData: any = {
+        user_id: publicUserId,
+        client_id: input.clientId,
+        title: input.title,
+        start_time: input.startTime ? new Date(input.startTime).toISOString() : null,
+        end_time: input.endTime ? new Date(input.endTime).toISOString() : null,
+        notes: input.notes || null,
+        platform: input.platform,
+        status: "pending",
+      };
+
       const { data, error } = (await ctx.supabase
         .from("bookings")
-        .insert([
-          {
-            user_id: publicUserId,
-            client_id: input.clientId,
-            title: input.title,
-            start_time: input.startTime ? new Date(input.startTime).toISOString() : null,
-            end_time: input.endTime ? new Date(input.endTime).toISOString() : null,
-            notes: input.notes || null,
-            platform: input.platform,
-            status: "pending",
-          } as any,
-        ])
+        .insert([bookingData])
         .select()
         .single()) as any;
 

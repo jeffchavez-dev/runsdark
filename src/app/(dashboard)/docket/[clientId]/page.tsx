@@ -154,7 +154,7 @@ export default function DocketPage({ params }: { params: { clientId: string } })
     return Object.entries(byDay);
   }, [completedTasks]);
 
-  const selected = tasks.find((t: any) => t.id === selectedTaskId) || null;
+  const selected: any = tasks.find((t: any) => t.id === selectedTaskId) || null;
 
   const handleCreateTask = () => {
     if (!newTaskTitle.trim()) return;
@@ -496,8 +496,8 @@ export default function DocketPage({ params }: { params: { clientId: string } })
               type="text"
               value={selected.title}
               onChange={(e) => {
-                const updated = { ...selected, title: e.target.value };
-                // Update in place for now
+                // TODO: Implement task title update
+                void e.target.value;
               }}
               className="flex-1 text-lg font-semibold bg-none border-none outline-none text-white"
             />
@@ -539,7 +539,7 @@ export default function DocketPage({ params }: { params: { clientId: string } })
               <select
                 value={selected.priority || ""}
                 onChange={(e) =>
-                  updatePriorityMutation.mutate({ taskId: selected.id, priority: e.target.value || null })
+                  updatePriorityMutation.mutate({ taskId: selected.id, priority: (e.target.value || null) as any })
                 }
                 className="w-full px-3 py-2 bg-bg-surface border border-bg-border rounded-lg text-white text-sm outline-none focus:border-accent-primary"
               >

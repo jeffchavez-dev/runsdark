@@ -69,7 +69,7 @@ export function BookingBoard({
                     <BookingCard
                       key={booking.id}
                       {...booking}
-                      onStatusChange={(newStatus) => onStatusChange(booking.id, newStatus)}
+                      onStatusChange={(newStatus) => onStatusChange(booking.id, newStatus as Booking['status'])}
                       onEdit={onEdit ? () => onEdit(booking.id) : undefined}
                       onDelete={onDelete ? () => onDelete(booking.id) : undefined}
                     />
