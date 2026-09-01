@@ -13,7 +13,10 @@ export const clientsRouter = router({
       .eq("user_id", publicUserId)
       .order("created_at", { ascending: false });
 
-    if (error) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
+    if (error) {
+      console.error("[clients]", error);
+      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Operation failed" });
+    }
     return data || [];
   }),
 
@@ -41,7 +44,10 @@ export const clientsRouter = router({
         .select()
         .single();
 
-      if (error) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
+      if (error) {
+      console.error("[clients]", error);
+      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Operation failed" });
+    }
       return data;
     }),
 
@@ -66,7 +72,10 @@ export const clientsRouter = router({
         .select()
         .single();
 
-      if (error) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
+      if (error) {
+      console.error("[clients]", error);
+      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Operation failed" });
+    }
       return data;
     }),
 
@@ -81,7 +90,10 @@ export const clientsRouter = router({
         .eq("id", input.id)
         .eq("user_id", publicUserId);
 
-      if (error) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
+      if (error) {
+      console.error("[clients]", error);
+      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Operation failed" });
+    }
       return { success: true };
     }),
 });

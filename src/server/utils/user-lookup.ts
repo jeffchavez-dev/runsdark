@@ -17,12 +17,12 @@ export async function getPublicUserId(
 
   if (error) {
     console.error("[getPublicUserId] Query error:", error);
-    throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: `Database error: ${error.message}` });
+    throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to verify user" });
   }
 
   const publicUserId = user?.id;
   if (!publicUserId) {
-    console.error("[getPublicUserId] No user found for auth ID:", authUserId);
+    console.error("[getPublicUserId] User profile not found");
     throw new TRPCError({ code: "UNAUTHORIZED", message: "User profile not found" });
   }
 

@@ -19,7 +19,7 @@ export function createClient() {
       domain: process.env.NODE_ENV === "development" ? undefined : ".runsdark.com",
       path: "/",
       sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
     },
   });
 

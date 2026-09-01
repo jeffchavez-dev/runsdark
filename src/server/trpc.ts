@@ -11,23 +11,39 @@ interface Context {
 export async function createContext(
   opts?: CreateNextContextOptions
 ): Promise<Context> {
-  // Use service role key for tRPC operations
-  // This bypasses auth session issues and allows us to query the database
+  // Use ANON key to respect RLS policies
   const supabase = createSupabaseClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  // Extract user ID from request headers sent by the client
   let userId: string | null = null;
-  const userIdHeader = opts?.req?.headers.get?.("x-user-id");
-  if (userIdHeader) {
-    userId = userIdHeader;
+  let userEmail: string | null = null;
+
+  // Extract and validate Bearer token from Authorization header
+  if (opts?.req) {
+    const authHeader = (opts.req.headers as any).get?.("Authorization") || (opts.req as any).headers?.["authorization"];
+    if (authHeader && typeof authHeader === "string" && authHeader.startsWith("Bearer ")) {
+      const token = authHeader.slice(7);
+      try {
+        const {
+          data: { user },
+          error,
+        } = await supabase.auth.getUser(token);
+
+        if (!error && user) {
+          userId = user.id;
+          userEmail = user.email || null;
+        }
+      } catch {
+        // Token validation failed; userId remains null
+      }
+    }
   }
 
   return {
     userId,
-    userEmail: null,
+    userEmail,
     supabase,
   };
 }

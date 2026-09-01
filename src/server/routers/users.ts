@@ -31,7 +31,8 @@ export const usersRouter = router({
       .single();
 
     if (error) {
-      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
+      console.error("[users.sync]", error);
+      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to sync user" });
     }
 
     return { success: true, created: true, user: data };

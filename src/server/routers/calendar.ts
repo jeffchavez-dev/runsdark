@@ -37,8 +37,10 @@ export const calendarRouter = router({
 
       const { data, error } = (await query) as any;
 
-      if (error)
-        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
+      if (error) {
+        console.error("[calendar.listBookings]", error);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to fetch bookings" });
+      }
       return (data || []) as any;
     }),
 
@@ -74,8 +76,10 @@ export const calendarRouter = router({
         .select()
         .single()) as any;
 
-      if (error)
-        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
+      if (error) {
+        console.error("[calendar.listBookings]", error);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to fetch bookings" });
+      }
       return data as any;
     }),
 
@@ -84,6 +88,7 @@ export const calendarRouter = router({
     .input(
       z.object({
         id: z.string().uuid(),
+        clientId: z.string().uuid(),
         title: z.string().min(1).max(255).optional(),
         startTime: z.string().datetime().optional(),
         endTime: z.string().datetime().optional(),
@@ -93,7 +98,23 @@ export const calendarRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const publicUserId = await getPublicUserId(ctx.supabase, ctx.userId);
-      const { id, startTime, endTime, followUpAt, ...updates } = input;
+      const { id, clientId, startTime, endTime, followUpAt, ...updates } = input;
+
+      // Verify booking belongs to specified client and current user
+      const { data: booking, error: fetchError } = (await ctx.supabase
+        .from("bookings")
+        .select("id")
+        .eq("id", id)
+        .eq("client_id", clientId)
+        .eq("user_id", publicUserId)
+        .single()) as any;
+
+      if (fetchError || !booking) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Booking not found or access denied",
+        });
+      }
 
       const updateData: Record<string, any> = {
         ...updates,
@@ -109,11 +130,12 @@ export const calendarRouter = router({
         .update(updateData)
         .eq("id", id)
         .eq("user_id", publicUserId)
+        .eq("client_id", clientId)
         .select()
         .single()) as any;
 
       if (error)
-        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to update booking" });
       return data as any;
     }),
 
@@ -122,6 +144,7 @@ export const calendarRouter = router({
     .input(
       z.object({
         id: z.string().uuid(),
+        clientId: z.string().uuid(),
         newStatus: bookingStatusEnum,
         note: z.string().optional(),
       })
@@ -129,16 +152,20 @@ export const calendarRouter = router({
     .mutation(async ({ ctx, input }) => {
       const publicUserId = await getPublicUserId(ctx.supabase, ctx.userId);
 
-      // Get current booking to find old status
+      // Get current booking to find old status (verify ownership)
       const { data: currentBooking, error: fetchError } = (await ctx.supabase
         .from("bookings")
         .select("status")
         .eq("id", input.id)
+        .eq("client_id", input.clientId)
         .eq("user_id", publicUserId)
         .single()) as any;
 
-      if (fetchError)
-        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: fetchError.message });
+      if (fetchError || !currentBooking)
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Booking not found or access denied",
+        });
 
       // Update booking status
       const { data: updatedBooking, error: updateError } = (await ctx.supabase
@@ -149,11 +176,12 @@ export const calendarRouter = router({
         })
         .eq("id", input.id)
         .eq("user_id", publicUserId)
+        .eq("client_id", input.clientId)
         .select()
         .single()) as any;
 
       if (updateError)
-        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: updateError.message });
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to update booking status" });
 
       // Log the status transition
       if (currentBooking.status !== input.newStatus) {
@@ -167,7 +195,7 @@ export const calendarRouter = router({
         ])) as any;
 
         if (historyError) {
-          console.error("Failed to log booking status change:", historyError);
+          console.error("Failed to log booking status change");
           // Don't fail the mutation, but log the error
         }
       }
@@ -198,8 +226,10 @@ export const calendarRouter = router({
         .eq("booking_id", input.id)
         .order("changed_at", { ascending: false })) as any;
 
-      if (error)
-        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
+      if (error) {
+        console.error("[calendar.listBookings]", error);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to fetch bookings" });
+      }
       return (data || []) as any;
     }),
 
@@ -215,8 +245,10 @@ export const calendarRouter = router({
         .eq("id", input.id)
         .eq("user_id", publicUserId);
 
-      if (error)
-        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
+      if (error) {
+        console.error("[calendar.listBookings]", error);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to fetch bookings" });
+      }
       return { success: true };
     }),
 });

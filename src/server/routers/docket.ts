@@ -33,7 +33,10 @@ export const docketRouter = router({
         .eq("client_id", input.clientId)
         .order("created_at", { ascending: false });
 
-      if (error) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
+      if (error) {
+        console.error("[docket]", error);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Operation failed" });
+      }
       return data || [];
     }),
 
@@ -65,7 +68,10 @@ export const docketRouter = router({
         .select()
         .single();
 
-      if (error) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
+      if (error) {
+        console.error("[docket]", error);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Operation failed" });
+      }
       return data;
     }),
 
@@ -91,7 +97,10 @@ export const docketRouter = router({
         .select()
         .single();
 
-      if (error) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
+      if (error) {
+        console.error("[docket]", error);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Operation failed" });
+      }
       return data;
     }),
 
@@ -114,7 +123,10 @@ export const docketRouter = router({
         .select()
         .single();
 
-      if (error) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
+      if (error) {
+        console.error("[docket]", error);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Operation failed" });
+      }
       return data;
     }),
 
@@ -141,7 +153,10 @@ export const docketRouter = router({
         .select()
         .single();
 
-      if (error) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
+      if (error) {
+        console.error("[docket]", error);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Operation failed" });
+      }
       return data;
     }),
 
@@ -157,7 +172,10 @@ export const docketRouter = router({
         .eq("id", input.taskId)
         .eq("user_id", publicUserId);
 
-      if (error) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
+      if (error) {
+        console.error("[docket]", error);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Operation failed" });
+      }
       return { success: true };
     }),
 
@@ -170,6 +188,23 @@ export const docketRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const publicUserId = await getPublicUserId(ctx.supabase, ctx.userId);
+
+      // Verify task ownership before adding subtask
+      const { data: task, error: taskError } = await ctx.supabase
+        .from("tasks")
+        .select("id")
+        .eq("id", input.taskId)
+        .eq("user_id", publicUserId)
+        .single();
+
+      if (taskError || !task) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You don't have permission to modify this task",
+        });
+      }
+
       const { data, error } = await ctx.supabase
         .from("subtasks")
         .insert([
@@ -182,7 +217,10 @@ export const docketRouter = router({
         .select()
         .single();
 
-      if (error) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
+      if (error) {
+        console.error("[docket]", error);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Operation failed" });
+      }
       return data;
     }),
 
@@ -190,13 +228,24 @@ export const docketRouter = router({
   toggleSubtask: protectedProcedure
     .input(z.object({ subtaskId: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
-      const { data: subtask } = await ctx.supabase
+      const publicUserId = await getPublicUserId(ctx.supabase, ctx.userId);
+
+      // Verify subtask ownership via task relationship
+      const { data: subtask, error: fetchError } = await ctx.supabase
         .from("subtasks")
-        .select("done")
+        .select("id, done, tasks!inner(id, user_id)")
         .eq("id", input.subtaskId)
+        .eq("tasks.user_id", publicUserId)
         .single();
 
-      const newDone = subtask?.done === "true" ? "false" : "true";
+      if (fetchError || !subtask) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You don't have permission to modify this subtask",
+        });
+      }
+
+      const newDone = (subtask as any)?.done === "true" ? "false" : "true";
 
       const { data, error } = await ctx.supabase
         .from("subtasks")
@@ -205,7 +254,10 @@ export const docketRouter = router({
         .select()
         .single();
 
-      if (error) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
+      if (error) {
+        console.error("[docket]", error);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Operation failed" });
+      }
       return data;
     }),
 
@@ -213,12 +265,32 @@ export const docketRouter = router({
   deleteSubtask: protectedProcedure
     .input(z.object({ subtaskId: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
+      const publicUserId = await getPublicUserId(ctx.supabase, ctx.userId);
+
+      // Verify subtask ownership via task relationship
+      const { data: subtask, error: fetchError } = await ctx.supabase
+        .from("subtasks")
+        .select("id, tasks!inner(id, user_id)")
+        .eq("id", input.subtaskId)
+        .eq("tasks.user_id", publicUserId)
+        .single();
+
+      if (fetchError || !subtask) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You don't have permission to delete this subtask",
+        });
+      }
+
       const { error } = await ctx.supabase
         .from("subtasks")
         .delete()
         .eq("id", input.subtaskId);
 
-      if (error) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
+      if (error) {
+        console.error("[docket]", error);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Operation failed" });
+      }
       return { success: true };
     }),
 
@@ -231,6 +303,23 @@ export const docketRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const publicUserId = await getPublicUserId(ctx.supabase, ctx.userId);
+
+      // Verify task ownership before adding comment
+      const { data: task, error: taskError } = await ctx.supabase
+        .from("tasks")
+        .select("id")
+        .eq("id", input.taskId)
+        .eq("user_id", publicUserId)
+        .single();
+
+      if (taskError || !task) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You don't have permission to comment on this task",
+        });
+      }
+
       const { data, error } = await ctx.supabase
         .from("task_comments")
         .insert([
@@ -242,7 +331,10 @@ export const docketRouter = router({
         .select()
         .single();
 
-      if (error) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
+      if (error) {
+        console.error("[docket]", error);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Operation failed" });
+      }
       return data;
     }),
 });

@@ -14,15 +14,15 @@ function createTRPCClient() {
       httpBatchLink({
         url: `${process.env.NEXT_PUBLIC_APP_URL}/api/trpc`,
         async headers() {
-          // Get the current user ID from Supabase and send it to the server
+          // Get the current session token from Supabase and send it to the server
           const supabase = createClient();
           const {
             data: { session },
           } = await supabase.auth.getSession();
 
           const headers: Record<string, string> = {};
-          if (session?.user?.id) {
-            headers["x-user-id"] = session.user.id;
+          if (session?.access_token) {
+            headers["Authorization"] = `Bearer ${session.access_token}`;
           }
           return headers;
         },
